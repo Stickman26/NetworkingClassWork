@@ -33,6 +33,7 @@
 #include "RakNet/MessageIdentifiers.h"
 #include "RakNet/BitStream.h"
 #include "RakNet/RakNetTypes.h"  // MessageID
+#include "RakNet/GetTime.h"
 
 #define SERVER_PORT 4024
 
@@ -53,7 +54,7 @@ int main(int const argc, char const* const argv[])
 	RakNet::SocketDescriptor sd;
 	peer->Startup(1, &sd, 1);
 
-	strcpy(str, "172.16.2.64");
+	strcpy(str, "65.183.134.40");
 
 	printf("Starting the client.\n");
 	peer->Connect(str, SERVER_PORT, 0, 0);
@@ -85,23 +86,16 @@ int main(int const argc, char const* const argv[])
 				case ID_CONNECTION_LOST:
 					printf("Connection lost.\n");
 					break;
-				case ID_TIMESTAMP:
-					{
-						RakNet::RakString rs;
-						RakNet::BitStream bsIn(packet->data, packet->length, false);
-						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-						bsIn.Read(rs);
-						printf("%s\n", rs.C_String());
-					}
-					break;
 				case ID_GAME_MESSAGE_1:
 					{
+						RakNet::Time rt;
 						RakNet::RakString rs;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rt);
+						printf("%" PRINTF_64_BIT_MODIFIER "u ", rt);
 						bsIn.Read(rs);
-						printf("%s\n", rs.C_String());
+						printf("%s\n" , rs.C_String());
 					}
 					break;
 				default:

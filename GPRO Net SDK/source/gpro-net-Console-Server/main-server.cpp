@@ -81,6 +81,11 @@ int main(int const argc, char const* const argv[])
 				case ID_CONNECTION_LOST:
 					printf("A client lost the connection.\n");
 					break;
+				case ID_TIMESTAMP:
+				{
+					
+				}
+				break;
 				case ID_GAME_MESSAGE_1:
 					{
 						RakNet::RakString rs;
@@ -90,9 +95,8 @@ int main(int const argc, char const* const argv[])
 						printf("%s\n", rs.C_String());
 
 						RakNet::BitStream bsOut;
-						bsOut.Write((RakNet::MessageID)ID_TIMESTAMP);
-						bsOut.Write((RakNet::Time)RakNet::GetTime());
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write((RakNet::Time)RakNet::GetTime());
 						bsOut.Write("Recieved Message");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 					}
