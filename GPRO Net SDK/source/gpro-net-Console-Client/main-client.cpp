@@ -75,6 +75,11 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write("Hello world");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+						bsOut.Reset();
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_2);
+						bsOut.Write("Hello squirel");
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 					}
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:

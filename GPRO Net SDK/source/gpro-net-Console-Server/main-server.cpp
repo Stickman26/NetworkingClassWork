@@ -93,12 +93,26 @@ int main(int const argc, char const* const argv[])
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 						bsIn.Read(rs);
-						printf("%s\n", rs.C_String());
+						printf("M1: %s\n", rs.C_String());
 
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write("Recieved Message");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					}
+					break;
+				case ID_GAME_MESSAGE_2:
+					{
+						RakNet::RakString rs;
+						RakNet::BitStream bsIn(packet->data, packet->length, false);
+						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rs);
+						printf("M2: %s\n", rs.C_String());
+
+						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(rs.C_String());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 					}
 					break;
 				default:
