@@ -41,12 +41,14 @@
 
 enum GameMessages
 {
-	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
+	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
+	ID_GAME_MESSAGE_2
 };
 
 
 int main(int const argc, char const* const argv[])
 {
+
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
 
@@ -64,16 +66,15 @@ int main(int const argc, char const* const argv[])
 			switch (packet->data[0])
 			{
 				case ID_NEW_INCOMING_CONNECTION:
-					printf("A connection is incoming.\n");
+					{
+						printf("A connection is incoming.\n");
+					}
 					break;
 				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
 					printf("Another client has disconnected.\n");
 					break;
 				case ID_REMOTE_CONNECTION_LOST:
 					printf("Another client has lost the connection.\n");
-					break;
-				case ID_REMOTE_NEW_INCOMING_CONNECTION:
-					printf("Another client has connected.\n");
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 					printf("A client has disconnected.\n");
@@ -82,10 +83,10 @@ int main(int const argc, char const* const argv[])
 					printf("A client lost the connection.\n");
 					break;
 				case ID_TIMESTAMP:
-				{
-					
-				}
-				break;
+					{
+						
+					}
+					break;
 				case ID_GAME_MESSAGE_1:
 					{
 						RakNet::RakString rs;
@@ -96,9 +97,8 @@ int main(int const argc, char const* const argv[])
 
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write((RakNet::Time)RakNet::GetTime());
 						bsOut.Write("Recieved Message");
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
 					}
 					break;
 				default:

@@ -39,7 +39,8 @@
 
 enum GameMessages
 {
-	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
+	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
+	ID_GAME_MESSAGE_2
 };
 
 
@@ -68,7 +69,6 @@ int main(int const argc, char const* const argv[])
 				case ID_CONNECTION_REQUEST_ACCEPTED:
 					{
 						printf("Our connection request has been accepted.\n");
-
 						// Use a BitStream to write a custom user message
 						// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
 						RakNet::BitStream bsOut;
@@ -76,6 +76,9 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write("Hello world");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 					}
+					break;
+				case ID_REMOTE_NEW_INCOMING_CONNECTION:
+					printf("Another client has connected.\n");
 					break;
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 					printf("The server is full.\n");
@@ -88,12 +91,9 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_GAME_MESSAGE_1:
 					{
-						RakNet::Time rt;
 						RakNet::RakString rs;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-						bsIn.Read(rt);
-						printf("%" PRINTF_64_BIT_MODIFIER "u ", rt);
 						bsIn.Read(rs);
 						printf("%s\n" , rs.C_String());
 					}
