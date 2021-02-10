@@ -28,6 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <iostream>
+#include <fstream>
 
 
 #include "RakNet/RakPeerInterface.h"
@@ -49,11 +51,15 @@ enum GameMessages
 int main(int const argc, char const* const argv[])
 {
 
+	std::ofstream messages;
+
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
 
 	RakNet::SocketDescriptor sd(SERVER_PORT, 0);
 	peer->Startup(MAX_CLIENTS, &sd, 1);
+	messages.open("logs.txt", std::fstream::out | std::fstream::trunc);
+	messages.close();
 
 	printf("Starting the server.\n");
 	// We need to let the server accept incoming connections from the clients
@@ -84,16 +90,26 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_TIMESTAMP:
 					{
-						
+
 					}
 					break;
 				case ID_GAME_MESSAGE_1:
 					{
 						RakNet::RakString rs;
+						RakNet::Time rt;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rt);
+
+						messages.open("logs.txt", std::fstream::app);
+						messages << rt << ": ";
+
 						bsIn.Read(rs);
 						printf("M1: %s\n", rs.C_String());
+
+						messages << rs.C_String();
+						messages << "\n";
+						messages.close();
 
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
@@ -104,10 +120,21 @@ int main(int const argc, char const* const argv[])
 				case ID_GAME_MESSAGE_2:
 					{
 						RakNet::RakString rs;
+						RakNet::Time rt;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						
+						bsIn.Read(rt);
+
+						messages.open("logs.txt", std::fstream::app);
+						messages << rt << ": ";
+
 						bsIn.Read(rs);
 						printf("M2: %s\n", rs.C_String());
+
+						messages << rs.C_String();
+						messages << "\n";
+						messages.close();
 
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
