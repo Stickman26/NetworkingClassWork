@@ -34,6 +34,8 @@
 #include "RakNet/BitStream.h"
 #include "RakNet/RakNetTypes.h"  // MessageID
 #include "RakNet/GetTime.h"
+#include <string>
+#include <iostream>
 
 #define SERVER_PORT 4024
 
@@ -49,6 +51,8 @@ int main(int const argc, char const* const argv[])
 
 	char str[512];
 
+	bool isConnected = false;
+
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
 
@@ -62,6 +66,48 @@ int main(int const argc, char const* const argv[])
 
 	while (1)
 	{
+
+		if (isConnected) 
+		{
+			//do the thing
+			RakNet::BitStream bsOut;
+			std::string userMessage;
+			char* userSelection = NULL;
+
+			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone");
+			scanf(userSelection);
+
+			switch (*userSelection) 
+			{
+				case 'r':
+					break;
+				case 'd':
+					printf("Enter a Message: ");
+					std::getline(std::cin, userMessage);
+
+					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_2);
+					bsOut.Write((RakNet::Time)RakNet::GetTime());
+					bsOut.Write(userMessage);
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+					break;
+				case 'a':
+					printf("Enter a Message: ");
+					std::getline(std::cin, userMessage);
+
+					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+					bsOut.Write((RakNet::Time)RakNet::GetTime());
+					bsOut.Write(userMessage);
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+
+					break;
+				default:
+					printf("Invalid Input");
+					continue;
+					break;
+			}
+		}
+
 		for (packet = peer->Receive(); packet; peer->DeallocatePacket(packet), packet = peer->Receive())
 		{
 			switch (packet->data[0])
@@ -71,6 +117,7 @@ int main(int const argc, char const* const argv[])
 						printf("Our connection request has been accepted.\n");
 						// Use a BitStream to write a custom user message
 						// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
+						isConnected = true;
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write((RakNet::Time)RakNet::GetTime());
@@ -89,12 +136,15 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 					printf("The server is full.\n");
+					isConnected = false;
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 					printf("We have been disconnected.\n");
+					isConnected = false;
 					break;
 				case ID_CONNECTION_LOST:
 					printf("Connection lost.\n");
+					isConnected = false;
 					break;
 				case ID_GAME_MESSAGE_1:
 					{
