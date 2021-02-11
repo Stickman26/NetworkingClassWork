@@ -84,25 +84,47 @@ int main(int const argc, char const* const argv[])
 					}
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
-					printf("A client has disconnected.\n");
-					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
 					{
-						if (it->second == packet->systemAddress) 
+						std::string rs;
+
+						for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
 						{
-							userList.erase(it);
-							break;
+							if (it->second == packet->systemAddress) 
+							{
+								rs = it->first;
+								userList.erase(it);
+								break;
+							}
 						}
+
+						printf("%s has disconnected.\n", rs.c_str());
+
+						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_REMOTE_DISCONNECTION_NOTIFICATION);
+						bsOut.Write(rs.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);	
 					}
 					break;
 				case ID_CONNECTION_LOST:
-					printf("A client lost the connection.\n");
-					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
 					{
-						if (it->second == packet->systemAddress)
+						std::string rs;
+
+						for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
 						{
-							userList.erase(it);
-							break;
+							if (it->second == packet->systemAddress)
+							{
+								rs = it->first;
+								userList.erase(it);
+								break;
+							}
 						}
+
+						printf("%s lost the connection.\n", rs.c_str());
+
+						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_REMOTE_DISCONNECTION_NOTIFICATION);
+						bsOut.Write(rs.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
 					break;
 				case ID_SEND_IDENTIFICATION:
@@ -113,6 +135,11 @@ int main(int const argc, char const* const argv[])
 						bsIn.Read(rs);
 						userList.insert(std::pair<std::string, RakNet::SystemAddress>(rs, packet->systemAddress));
 						printf("%s has connected\n", rs.C_String());
+
+						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_REMOTE_NEW_INCOMING_CONNECTION);
+						bsOut.Write(rs.C_String());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
 					break;
 				case ID_SEND_LIST:

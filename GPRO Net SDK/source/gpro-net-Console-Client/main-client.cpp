@@ -156,13 +156,31 @@ int main(int const argc, char const* const argv[])
 					}
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:
-					printf("Another client has connected.\n");
+					{
+						RakNet::RakString rs;
+						RakNet::BitStream bsIn(packet->data, packet->length, false);
+						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rs);
+						printf("%s has connected.\n", rs.C_String());
+					}
 					break;
 				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-					printf("Another client has disconnected.\n");
+					{
+						RakNet::RakString rs;
+						RakNet::BitStream bsIn(packet->data, packet->length, false);
+						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rs);
+						printf("%s has disconnected.\n", rs.C_String());
+					}
 					break;
 				case ID_REMOTE_CONNECTION_LOST:
-					printf("Another client has lost the connection.\n");
+					{
+						RakNet::RakString rs;
+						RakNet::BitStream bsIn(packet->data, packet->length, false);
+						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rs);
+						printf("%s has lost the connection.\n", rs.C_String());	
+					}
 					break;
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 					printf("The server is full.\n");
