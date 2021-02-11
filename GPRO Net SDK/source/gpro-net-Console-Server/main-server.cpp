@@ -30,6 +30,8 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <sstream>
 
 
 #include "RakNet/RakPeerInterface.h"
@@ -44,7 +46,8 @@
 enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-	ID_GAME_MESSAGE_2
+	ID_GAME_MESSAGE_2,
+	ID_SEND_IDENTIFICATION
 };
 
 
@@ -52,6 +55,9 @@ int main(int const argc, char const* const argv[])
 {
 
 	std::ofstream messages;
+
+	//Add a map for users and their IPs
+	std::map<std::string, RakNet::SystemAddress> userList;
 
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
@@ -88,13 +94,19 @@ int main(int const argc, char const* const argv[])
 				case ID_CONNECTION_LOST:
 					printf("A client lost the connection.\n");
 					break;
-				case ID_TIMESTAMP:
+				case ID_SEND_IDENTIFICATION:
 					{
-
+						RakNet::RakString rs;
+						RakNet::BitStream bsIn(packet->data, packet->length, false);
+						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+						bsIn.Read(rs);
+						userList.insert(std::pair<std::string, RakNet::SystemAddress>(rs, packet->systemAddress));
+						printf("%s has connected\n", rs.C_String());
 					}
 					break;
 				case ID_GAME_MESSAGE_1:
 					{
+						RakNet::RakString id;
 						RakNet::RakString rs;
 						RakNet::Time rt;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
@@ -104,21 +116,28 @@ int main(int const argc, char const* const argv[])
 						messages.open("logs.txt", std::fstream::app);
 						messages << rt << ": ";
 
+						bsIn.Read(id);
 						bsIn.Read(rs);
-						printf("M1: %s\n", rs.C_String());
+						std::stringstream formatMessage;
+						formatMessage << "[" << id.C_String() << " to ALL]: " << rs.C_String() << "\n";
+						std::string sendMessage = formatMessage.str();
 
-						messages << rs.C_String();
+						printf(sendMessage.c_str());
+
+						messages << sendMessage.c_str();
 						messages << "\n";
 						messages.close();
 
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write("Recieved Message");
+						bsOut.Write(sendMessage.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
 					break;
 				case ID_GAME_MESSAGE_2:
 					{
+						RakNet::RakString uid; //user id
+						RakNet::RakString sid; //send id
 						RakNet::RakString rs;
 						RakNet::Time rt;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
@@ -129,17 +148,34 @@ int main(int const argc, char const* const argv[])
 						messages.open("logs.txt", std::fstream::app);
 						messages << rt << ": ";
 
+						bsIn.Read(uid);
+						bsIn.Read(sid);
 						bsIn.Read(rs);
-						printf("M2: %s\n", rs.C_String());
+						std::stringstream formatMessage;
+						formatMessage << "[" << uid.C_String() << " to " << sid.C_String() << "]: " << rs.C_String() << "\n";
+						std::string sendMessage = formatMessage.str();
 
-						messages << rs.C_String();
+						printf(sendMessage.c_str());
+
+						messages << sendMessage.c_str();
 						messages << "\n";
-						messages.close();
 
-						RakNet::BitStream bsOut;
-						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write(rs.C_String());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+						if (userList.find(sid.C_String()) != userList.end()) 
+						{
+							RakNet::BitStream bsOut;
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write(sendMessage.c_str());
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, userList.find(sid.C_String())->second, false);
+						}
+						else
+						{
+							RakNet::BitStream bsOut;
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write("User not found...");
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+						}
+
+						messages.close();
 					}
 					break;
 				default:

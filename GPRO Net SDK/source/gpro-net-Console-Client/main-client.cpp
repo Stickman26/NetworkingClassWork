@@ -42,7 +42,8 @@
 enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-	ID_GAME_MESSAGE_2
+	ID_GAME_MESSAGE_2,
+	ID_SEND_IDENTIFICATION
 };
 
 
@@ -53,6 +54,8 @@ int main(int const argc, char const* const argv[])
 
 	bool isConnected = false;
 
+	std::string thisUserID;
+
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
 
@@ -62,6 +65,10 @@ int main(int const argc, char const* const argv[])
 	strcpy(str, "65.183.134.40");
 
 	printf("Starting the client.\n");
+	printf("Enter Username: \n");
+	std::getline(std::cin, thisUserID);
+	//printf("%s", thisUserID.c_str());
+
 	peer->Connect(str, SERVER_PORT, 0, 0);
 
 	while (1)
@@ -71,35 +78,42 @@ int main(int const argc, char const* const argv[])
 		{
 			//do the thing
 			RakNet::BitStream bsOut;
+			std::string userID;
 			std::string userMessage;
-			char* userSelection = NULL;
+			std::string userSelection;
 
-			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone");
-			scanf(userSelection);
+			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\n");
+			std::getline(std::cin, userSelection);
 
-			switch (*userSelection) 
+			switch (userSelection[0]) 
 			{
 				case 'r':
 					break;
 				case 'd':
-					printf("Enter a Message: ");
+					printf("Who do you wish to connect to: ");
+					std::getline(std::cin, userID);
+
+					printf("Message: ");
 					std::getline(std::cin, userMessage);
 
 					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_2);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
-					bsOut.Write(userMessage);
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
-
+					bsOut.Write(thisUserID.c_str());
+					bsOut.Write(userID.c_str());
+					bsOut.Write(userMessage.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					continue;
 					break;
 				case 'a':
-					printf("Enter a Message: ");
+					printf("Message: ");
 					std::getline(std::cin, userMessage);
 
 					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
-					bsOut.Write(userMessage);
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
-
+					bsOut.Write(thisUserID.c_str());
+					bsOut.Write(userMessage.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					continue;
 					break;
 				default:
 					printf("Invalid Input");
@@ -119,6 +133,10 @@ int main(int const argc, char const* const argv[])
 						// Bitstreams are easier to use than sending casted structures, and handle endian swapping automatically
 						isConnected = true;
 						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_SEND_IDENTIFICATION);
+						bsOut.Write(thisUserID.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false); //Send User defined ID to server
+						/*
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write((RakNet::Time)RakNet::GetTime());
 						bsOut.Write("Hello world");
@@ -129,6 +147,7 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write((RakNet::Time)RakNet::GetTime());
 						bsOut.Write("Hello squirel");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
+						*/
 					}
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:
