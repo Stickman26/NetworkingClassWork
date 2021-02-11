@@ -43,7 +43,8 @@ enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
 	ID_GAME_MESSAGE_2,
-	ID_SEND_IDENTIFICATION
+	ID_SEND_IDENTIFICATION,
+	ID_SEND_LIST
 };
 
 
@@ -82,7 +83,7 @@ int main(int const argc, char const* const argv[])
 			std::string userMessage;
 			std::string userSelection;
 
-			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\n");
+			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\n");
 			std::getline(std::cin, userSelection);
 
 			switch (userSelection[0]) 
@@ -114,6 +115,10 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					continue;
+					break;
+				case 'l':
+					bsOut.Write((RakNet::MessageID)ID_SEND_LIST);
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					break;
 				default:
 					printf("Invalid Input");
@@ -152,6 +157,12 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:
 					printf("Another client has connected.\n");
+					break;
+				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+					printf("Another client has disconnected.\n");
+					break;
+				case ID_REMOTE_CONNECTION_LOST:
+					printf("Another client has lost the connection.\n");
 					break;
 				case ID_NO_FREE_INCOMING_CONNECTIONS:
 					printf("The server is full.\n");

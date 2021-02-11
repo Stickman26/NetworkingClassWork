@@ -47,7 +47,8 @@ enum GameMessages
 {
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
 	ID_GAME_MESSAGE_2,
-	ID_SEND_IDENTIFICATION
+	ID_SEND_IDENTIFICATION,
+	ID_SEND_LIST
 };
 
 
@@ -82,17 +83,27 @@ int main(int const argc, char const* const argv[])
 						printf("A connection is incoming.\n");
 					}
 					break;
-				case ID_REMOTE_DISCONNECTION_NOTIFICATION:
-					printf("Another client has disconnected.\n");
-					break;
-				case ID_REMOTE_CONNECTION_LOST:
-					printf("Another client has lost the connection.\n");
-					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 					printf("A client has disconnected.\n");
+					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+					{
+						if (it->second == packet->systemAddress) 
+						{
+							userList.erase(it);
+							break;
+						}
+					}
 					break;
 				case ID_CONNECTION_LOST:
 					printf("A client lost the connection.\n");
+					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+					{
+						if (it->second == packet->systemAddress)
+						{
+							userList.erase(it);
+							break;
+						}
+					}
 					break;
 				case ID_SEND_IDENTIFICATION:
 					{
@@ -103,6 +114,20 @@ int main(int const argc, char const* const argv[])
 						userList.insert(std::pair<std::string, RakNet::SystemAddress>(rs, packet->systemAddress));
 						printf("%s has connected\n", rs.C_String());
 					}
+					break;
+				case ID_SEND_LIST:
+				{
+					std::stringstream formatMessage;
+					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+					{
+						formatMessage << it->first << "\n";
+					}
+					std::string sendMessage = formatMessage.str();
+					RakNet::BitStream bsOut;
+					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+					bsOut.Write(sendMessage.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+				}
 					break;
 				case ID_GAME_MESSAGE_1:
 					{
@@ -158,8 +183,7 @@ int main(int const argc, char const* const argv[])
 						printf(sendMessage.c_str());
 
 						messages << sendMessage.c_str();
-						messages << "\n";
-
+						
 						if (userList.find(sid.C_String()) != userList.end()) 
 						{
 							RakNet::BitStream bsOut;
@@ -173,8 +197,10 @@ int main(int const argc, char const* const argv[])
 							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 							bsOut.Write("User not found...");
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+							messages << " <- Failed to send.";
 						}
 
+						messages << "\n";
 						messages.close();
 					}
 					break;
