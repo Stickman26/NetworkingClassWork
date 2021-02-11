@@ -29,6 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <map>
 #include <sstream>
@@ -51,6 +52,22 @@ enum GameMessages
 	ID_SEND_LIST
 };
 
+std::string ConvertTime(RakNet::Time ts) {
+	int timelump = (int)ts;
+
+	timelump /= 1000;
+	int seconds = timelump % 60;
+	timelump /= 60;
+	int minutes = timelump % 60;
+	timelump /= 60;
+	int hours = timelump % 24;
+	timelump /= 24;
+	int days = timelump;
+
+	std::stringstream timestamp;
+	timestamp << std::setw(2) << std::setfill('0') << "[" << hours << ":" << minutes << ":" << seconds << "]";
+	return timestamp.str();
+}
 
 int main(int const argc, char const* const argv[])
 {
@@ -166,12 +183,12 @@ int main(int const argc, char const* const argv[])
 						bsIn.Read(rt);
 
 						messages.open("logs.txt", std::fstream::app);
-						messages << rt << ": ";
+						messages << ConvertTime(rt) << ": ";
 
 						bsIn.Read(id);
 						bsIn.Read(rs);
 						std::stringstream formatMessage;
-						formatMessage << "[" << id.C_String() << " to ALL]: " << rs.C_String() << "\n";
+						formatMessage << "[" << id.C_String() << " to ALL]: " << rs.C_String();
 						std::string sendMessage = formatMessage.str();
 
 						printf(sendMessage.c_str());
@@ -204,7 +221,7 @@ int main(int const argc, char const* const argv[])
 						bsIn.Read(sid);
 						bsIn.Read(rs);
 						std::stringstream formatMessage;
-						formatMessage << "[" << uid.C_String() << " to " << sid.C_String() << "]: " << rs.C_String() << "\n";
+						formatMessage << "[" << uid.C_String() << " to " << sid.C_String() << "]: " << rs.C_String();
 						std::string sendMessage = formatMessage.str();
 
 						printf(sendMessage.c_str());
