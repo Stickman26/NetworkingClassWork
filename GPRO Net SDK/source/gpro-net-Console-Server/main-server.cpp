@@ -65,7 +65,7 @@ std::string ConvertTime(RakNet::Time ts) {
 	int days = timelump;
 
 	std::stringstream timestamp;
-	timestamp << std::setw(2) << std::setfill('0') << "[" << hours << ":" << minutes << ":" << seconds << "]";
+	timestamp << "[" << hours << ":" << minutes << ":" << seconds << "]";
 	return timestamp.str();
 }
 
@@ -215,7 +215,7 @@ int main(int const argc, char const* const argv[])
 						bsIn.Read(rt);
 
 						messages.open("logs.txt", std::fstream::app);
-						messages << rt << ": ";
+						messages << ConvertTime(rt) << ": ";
 
 						bsIn.Read(uid);
 						bsIn.Read(sid);
