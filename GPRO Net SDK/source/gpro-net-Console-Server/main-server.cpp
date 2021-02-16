@@ -39,6 +39,8 @@
 #include "RakNet/MessageIdentifiers.h"
 #include "RakNet/BitStream.h"
 #include "RakNet/RakNetTypes.h"  // MessageID
+#include "RakNet/NetworkIDObject.h"
+#include "RakNet/NetworkIDManager.h"
 #include "RakNet/GetTime.h"
 
 #define MAX_CLIENTS 10
@@ -49,7 +51,8 @@ enum GameMessages
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
 	ID_GAME_MESSAGE_2,
 	ID_SEND_IDENTIFICATION,
-	ID_SEND_LIST
+	ID_SEND_LIST,
+	ID_CREATE_MINE
 };
 
 std::string ConvertTime(RakNet::Time ts) {
@@ -68,6 +71,27 @@ std::string ConvertTime(RakNet::Time ts) {
 	timestamp << "[" << hours << ":" << minutes << ":" << seconds << "]";
 	return timestamp.str();
 }
+
+
+class Mine : public RakNet::NetworkIDObject
+{
+	struct MinePosition 
+	{
+		float x, y, z;
+	};
+
+	MinePosition minePos;
+
+	Mine(float x, float y, float z, RakNet::NetworkIDManager *networkIDManager) {
+
+		SetNetworkIDManager(networkIDManager);
+		minePos.x = x;
+		minePos.y = y;
+		minePos.z = z;
+	}
+	
+	MinePosition GetPosition() { return minePos; }
+};
 
 int main(int const argc, char const* const argv[])
 {

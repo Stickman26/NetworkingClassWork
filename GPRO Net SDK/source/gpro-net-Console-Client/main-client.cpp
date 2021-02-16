@@ -34,6 +34,8 @@
 #include "RakNet/BitStream.h"
 #include "RakNet/RakNetTypes.h"  // MessageID
 #include "RakNet/GetTime.h"
+#include "RakNet/NetworkIDObject.h"
+#include "RakNet/NetworkIDManager.h"
 #include <string>
 #include <iostream>
 
@@ -44,7 +46,8 @@ enum GameMessages
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
 	ID_GAME_MESSAGE_2,
 	ID_SEND_IDENTIFICATION,
-	ID_SEND_LIST
+	ID_SEND_LIST,
+	ID_CREATE_MINE
 };
 
 
