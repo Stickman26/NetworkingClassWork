@@ -24,6 +24,7 @@
 
 #include "gpro-net/gpro-net.h"
 #include "gpro-net/MineLab.h"
+#include "gpro-net/GameMessages.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,23 +33,9 @@
 #include <iostream>
 
 #include "RakNet/RakPeerInterface.h"
-#include "RakNet/MessageIdentifiers.h"
-#include "RakNet/BitStream.h"
-#include "RakNet/RakNetTypes.h"  // MessageID
 #include "RakNet/GetTime.h"
 
 #define SERVER_PORT 4024
-
-enum GameMessages
-{
-	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1,
-	ID_GAME_MESSAGE_2,
-	ID_SEND_IDENTIFICATION,
-	ID_SEND_LIST,
-	ID_CREATE_MINE,
-	ID_CREATE_ROOM,
-	ID_JOIN_ROOM
-};
 
 
 int main(int const argc, char const* const argv[])

@@ -24,9 +24,6 @@
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\gpro-net\MineLab.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net-console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -45,12 +42,12 @@
     <ClInclude Include="..\..\..\include\gpro-net\blackjack\player.h">
       <Filter>Header Files\blackjack</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\GameMessages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\gpro-net\MineLab.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net-console_win.c">
@@ -70,6 +67,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\gpro-net\blackjack\player.cpp">
       <Filter>Source Files\blackjack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\GameMessages.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
