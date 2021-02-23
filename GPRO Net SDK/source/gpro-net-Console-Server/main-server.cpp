@@ -23,7 +23,7 @@
 */
 
 #include "gpro-net/gpro-net.h"
-#include "gpro-net/MineLab.h"
+//#include "gpro-net/MineLab.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +49,9 @@ enum GameMessages
 	ID_GAME_MESSAGE_2,
 	ID_SEND_IDENTIFICATION,
 	ID_SEND_LIST,
-	ID_CREATE_MINE
+	ID_CREATE_MINE,
+	ID_JOIN_ROOM,
+	ID_CREATE_ROOM
 };
 
 std::string ConvertTime(RakNet::Time ts) {
@@ -76,6 +78,9 @@ int main(int const argc, char const* const argv[])
 
 	//Add a map for users and their IPs
 	std::map<std::string, RakNet::SystemAddress> userList;
+	
+	//room list for storing room ID
+	std::map<std::string, RakNet::SystemAddress> roomList;
 
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
@@ -248,6 +253,36 @@ int main(int const argc, char const* const argv[])
 						messages.close();
 					}
 					break;
+				case ID_CREATE_ROOM:
+				{
+					RakNet::RakString id;
+					RakNet::RakString rs;
+					RakNet::Time rt;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					//read in time stamp
+					bsIn.Read(rt);
+					//read in user ID
+					bsIn.Read(id);
+					//read in room ID that user is trying to create
+					bsIn.Read(rs);
+
+					//add to list of rooms which needs to be stored somewhere (perhaps as a list like our user IDs?)
+					roomList.insert(std::pair<std::string, RakNet::SystemAddress>(rs, packet->systemAddress));
+					printf("%s has created room w/ ID: ", id.C_String());
+					printf("%s", rs.C_String());
+
+					std::stringstream formatMessage;
+					formatMessage << "[" << id.C_String() << " attempted to join room " << rs.C_String() << "]: " << rs.C_String();
+					std::string sendMessage = formatMessage.str();
+
+					printf(sendMessage.c_str());
+
+					RakNet::BitStream bsOut;
+					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+					bsOut.Write(sendMessage.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+				}
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;

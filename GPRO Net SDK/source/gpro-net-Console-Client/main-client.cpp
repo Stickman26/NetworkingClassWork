@@ -45,7 +45,9 @@ enum GameMessages
 	ID_GAME_MESSAGE_2,
 	ID_SEND_IDENTIFICATION,
 	ID_SEND_LIST,
-	ID_CREATE_MINE
+	ID_CREATE_MINE,
+	ID_CREATE_ROOM,
+	ID_JOIN_ROOM
 };
 
 
@@ -84,7 +86,7 @@ int main(int const argc, char const* const argv[])
 			std::string userMessage;
 			std::string userSelection;
 
-			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\n");
+			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room\n");
 			std::getline(std::cin, userSelection);
 
 			switch (userSelection[0]) 
@@ -121,6 +123,32 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write((RakNet::MessageID)ID_SEND_LIST);
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					break;
+				case 'j':
+					//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
+					printf("Please enter the room ID or user ID to join: ");
+					std::getline(std::cin, userID);
+
+					bsOut.Write((RakNet::MessageID)ID_JOIN_ROOM);
+					bsOut.Write((RakNet::Time)RakNet::GetTime());
+					bsOut.Write(thisUserID.c_str());
+					bsOut.Write(userID.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					continue;
+					break;
+
+				case ID_CREATE_ROOM:
+					//have user enter a room ID
+					printf("Please enter a room ID: ");
+					std::getline(std::cin, userID);
+
+					bsOut.Write((RakNet::MessageID)ID_CREATE_ROOM);
+					bsOut.Write((RakNet::Time)RakNet::GetTime());
+					bsOut.Write(thisUserID.c_str());
+					bsOut.Write(userID.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					continue;
+					break;
+
 				default:
 					printf("Invalid Input");
 					continue;
@@ -155,7 +183,7 @@ int main(int const argc, char const* const argv[])
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 						*/
 
-						Mine red(1f,2f,3f)
+						//Mine red(1f, 2f, 3f);
 					}
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:
@@ -206,6 +234,10 @@ int main(int const argc, char const* const argv[])
 						printf("%s\n" , rs.C_String());
 					}
 					break;
+				case ID_JOIN_ROOM: 
+				{
+
+				}
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;
