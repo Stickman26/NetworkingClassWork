@@ -23,21 +23,19 @@
 */
 
 #include "gpro-net/gpro-net.h"
-
+#include "gpro-net/MineLab.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <string>
+#include <iostream>
 
 #include "RakNet/RakPeerInterface.h"
 #include "RakNet/MessageIdentifiers.h"
 #include "RakNet/BitStream.h"
 #include "RakNet/RakNetTypes.h"  // MessageID
 #include "RakNet/GetTime.h"
-#include "RakNet/NetworkIDObject.h"
-#include "RakNet/NetworkIDManager.h"
-#include <string>
-#include <iostream>
 
 #define SERVER_PORT 4024
 
@@ -156,6 +154,8 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write("Hello squirel");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, packet->systemAddress, false);
 						*/
+
+						Mine red(1f,2f,3f)
 					}
 					break;
 				case ID_REMOTE_NEW_INCOMING_CONNECTION:
