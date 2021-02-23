@@ -175,10 +175,13 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\gpro-net\gpro-net-console.h" />
+    <ClInclude Include="..\..\..\include\gpro-net\gpro-net-gamestate.h" />
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net.h" />
     <ClInclude Include="..\..\..\include\gpro-net\MineLab.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\gpro-net\gpro-net-console_win.c" />
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net.c" />
     <ClCompile Include="..\..\..\source\gpro-net\MineLab.cpp" />
   </ItemGroup>
