@@ -33,6 +33,8 @@
 #include <iomanip>
 #include <fstream>
 #include <map>
+#include <vector>
+#include <algorithm>
 #include <sstream>
 
 #include "RakNet/RakPeerInterface.h"
@@ -58,6 +60,14 @@ std::string ConvertTime(RakNet::Time ts) {
 	return timestamp.str();
 }
 
+struct GameRoom
+{
+	std::string RoomName;
+	int MaxPlayers;
+	std::map<std::string, RakNet::SystemAddress> Players;
+	std::map<std::string, RakNet::SystemAddress> Spectators;
+};
+
 int main(int const argc, char const* const argv[])
 {
 
@@ -67,7 +77,7 @@ int main(int const argc, char const* const argv[])
 	std::map<std::string, RakNet::SystemAddress> userList;
 	
 	//room list for storing room ID
-	std::map<std::string, RakNet::SystemAddress> roomList;
+	std::vector<GameRoom> roomList;
 
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
@@ -148,7 +158,7 @@ int main(int const argc, char const* const argv[])
 						RakNet::BitStream bsOut;
 						bsOut.Write((RakNet::MessageID)ID_REMOTE_NEW_INCOMING_CONNECTION);
 						bsOut.Write(rs.C_String());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
 					}
 					break;
 				case ID_SEND_LIST:
@@ -256,26 +266,37 @@ int main(int const argc, char const* const argv[])
 
 					std::stringstream formatMessage;
 					std::string sendMessage;
+					RakNet::BitStream bsOut;
+
 					//see if a room w/ specified ID exists
-					if (roomList.find(rs.C_String()) != roomList.end()) 
+					if (find(roomList.begin() , roomList.end(), rs.C_String()) != roomList.end()) 
 					{
 						//if it does
-						formatMessage << "[" << id.C_String() << " attempted to create a room w/ ID " << rs.C_String() << " but room already exists!]";
+						formatMessage << "[you have attempted to create a room w/ ID " << rs.C_String() << " but that room already exists!]";
 						sendMessage = formatMessage.str();
 						printf(sendMessage.c_str());
+
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(sendMessage.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 					}
 					else 
 					{
 						//if it doesn't exist add to list of rooms
-						roomList.insert(std::pair<std::string, RakNet::SystemAddress>(rs, packet->systemAddress));
-						printf("%s has created room w/ ID: ", id.C_String());
-						printf("%s", rs.C_String());
-					}
+						GameRoom newRoom;
+						newRoom.MaxPlayers = 8;
+						newRoom.RoomName = rs.C_String();
 
-					RakNet::BitStream bsOut;
-					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-					bsOut.Write(sendMessage.c_str());
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						roomList.push_back(newRoom);
+						printf("%s has created room w/ ID: %s", id.C_String(), rs.C_String());
+
+						formatMessage << "[" << id.C_String() << " has created Room " << rs.C_String() << "]";
+						sendMessage = formatMessage.str();
+
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(sendMessage.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					}
 				}
 				break;
 				case ID_JOIN_ROOM:
@@ -294,29 +315,37 @@ int main(int const argc, char const* const argv[])
 
 					std::stringstream formatMessage;
 					std::string sendMessage;
+					RakNet::BitStream bsOut;
 
 					//check if specified room exists and if it does, join it
-					if (roomList.find(rs.C_String()) != roomList.end()) 
+					std::vector<GameRoom>::iterator it = find(roomList.begin(), roomList.end(), rs.C_String());
+
+					if (it != roomList.end())
 					{
 						printf("%s has joined room w/ ID: ", id.C_String());
 						printf("%s", rs.C_String());
 						//actually join the room
 
+						it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
+
 						formatMessage << "[" << id.C_String() << " joined room " << rs.C_String() << "]\n";
 						sendMessage = formatMessage.str();
 						printf(sendMessage.c_str());
+
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(sendMessage.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
 					else 
 					{
-						formatMessage << "[" << id.C_String() << " attempted to join room " << rs.C_String() << "]\n";
+						printf("[%s attempted to join room %s]\n", id.C_String(), rs.C_String());
+						formatMessage << "[room " << rs.C_String() << " does not exist]\n";
 						sendMessage = formatMessage.str();
-						printf(sendMessage.c_str());
-					}
 
-					RakNet::BitStream bsOut;
-					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-					bsOut.Write(sendMessage.c_str());
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(sendMessage.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+					}
 				}
 				break;
 				default:

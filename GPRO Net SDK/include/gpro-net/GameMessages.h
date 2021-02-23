@@ -60,10 +60,11 @@ public:
 	struct StringMessage
 	{
 		std::string UserName;
+		std::string Recipent;
 		std::string Message;
 	} myMessage;
 
-	TextMessage();
+	TextMessage(std::string name, std::string reciever, std::string msg);
 	~TextMessage();
 
 };
@@ -73,6 +74,7 @@ namespace RakNet
 	RakNet::BitStream& operator << (RakNet::BitStream& out, TextMessage::StringMessage& in)
 	{
 		out.Write(in.UserName);
+		out.Write(in.Recipent);
 		out.Write(in.Message);
 		return out;
 	}
@@ -80,6 +82,8 @@ namespace RakNet
 	RakNet::BitStream& operator >> (RakNet::BitStream& in, TextMessage::StringMessage& out)
 	{
 		bool sucess = in.Read(out.UserName);
+		assert(sucess);
+		sucess = in.Read(out.Recipent);
 		assert(sucess);
 		sucess = in.Read(out.Message);
 		assert(sucess);

@@ -3,7 +3,7 @@
 #include "gpro-net/blackjack/game.h"
 
 
-void main() {
+void BlackJack() {
 	//Add a Dealer
 	addDealer();
 

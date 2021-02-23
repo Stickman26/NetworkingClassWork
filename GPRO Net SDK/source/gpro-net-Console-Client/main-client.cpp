@@ -79,6 +79,7 @@ int main(int const argc, char const* const argv[])
 			switch (userSelection[0]) 
 			{
 				case 'r':
+					system("cls");
 					break;
 				case 'd':
 					printf("Who do you wish to connect to: ");
@@ -93,8 +94,9 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(userID.c_str());
 					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					system("cls");
 					continue;
-					break;
+					//break;
 				case 'a':
 					printf("Message: ");
 					std::getline(std::cin, userMessage);
@@ -104,11 +106,13 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					system("cls");
 					continue;
-					break;
+					//break;
 				case 'l':
 					bsOut.Write((RakNet::MessageID)ID_SEND_LIST);
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					system("cls");
 					break;
 				case 'j':
 					//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
@@ -120,8 +124,9 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userID.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					system("cls");
 					continue;
-					break;
+					//break;
 
 				case 'c':
 					//have user enter a room ID
@@ -133,13 +138,14 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userID.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					system("cls");
 					continue;
-					break;
+					//break;
 
 				default:
 					printf("Invalid Input");
 					continue;
-					break;
+					//break;
 			}
 		}
 
