@@ -136,7 +136,7 @@ int main(int const argc, char const* const argv[])
 					continue;
 					break;
 
-				case ID_CREATE_ROOM:
+				case 'c':
 					//have user enter a room ID
 					printf("Please enter a room ID: ");
 					std::getline(std::cin, userID);
@@ -238,6 +238,16 @@ int main(int const argc, char const* const argv[])
 				{
 
 				}
+				break;
+				case ID_CREATE_ROOM:
+				{
+					RakNet::RakString rs;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(rs);
+					printf("%s\n", rs.C_String());
+				}
+				break;
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;

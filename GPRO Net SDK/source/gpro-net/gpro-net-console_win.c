@@ -22,7 +22,7 @@
 	Console management source for Windows.
 */
 
-#include "gpro-net/gpro-net-common/gpro-net-console.h"
+#include "gpro-net/gpro-net-console.h"
 #ifdef _WIN32
 
 #include <io.h>
