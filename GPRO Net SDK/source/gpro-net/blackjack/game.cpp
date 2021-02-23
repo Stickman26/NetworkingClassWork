@@ -1,5 +1,5 @@
 
-#include "game.h"
+#include "gpro-net/blackjack/game.h"
 #include<string>
 
 vector<Dealer*>dealerSet;

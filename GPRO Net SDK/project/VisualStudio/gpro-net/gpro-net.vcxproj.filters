@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\blackjack">
+      <UniqueIdentifier>{f6ee05c6-136f-487f-a405-3d3b9115afc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\blackjack">
+      <UniqueIdentifier>{5c1c330c-9056-46ca-93c8-606fde2c235c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net.h">
@@ -27,6 +33,18 @@
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net-gamestate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\blackjack\dealer.h">
+      <Filter>Header Files\blackjack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\blackjack\deck.h">
+      <Filter>Header Files\blackjack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\blackjack\game.h">
+      <Filter>Header Files\blackjack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\blackjack\player.h">
+      <Filter>Header Files\blackjack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net.c">
@@ -37,6 +55,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net-console_win.c">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\dealer.cpp">
+      <Filter>Source Files\blackjack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\deck.cpp">
+      <Filter>Source Files\blackjack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\game.cpp">
+      <Filter>Source Files\blackjack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\mainbj.cpp">
+      <Filter>Source Files\blackjack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\player.cpp">
+      <Filter>Source Files\blackjack</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

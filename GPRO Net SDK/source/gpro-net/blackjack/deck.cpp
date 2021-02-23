@@ -1,4 +1,4 @@
-#include "deck.h"
+#include "gpro-net/blackjack/deck.h"
 
 int Ace = 1;
 int J = 10;

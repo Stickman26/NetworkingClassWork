@@ -1,5 +1,5 @@
 
-#include "dealer.h"
+#include "gpro-net/blackjack/dealer.h"
 
 void Dealer::setPlayerSet(vector<Player*>& playerSet) {
 	this->playerSet = playerSet;

@@ -1,5 +1,5 @@
 
-#include "player.h"
+#include "gpro-net/blackjack/player.h"
 
 void Player::Hit() {
 	this->hand.push_back(getCard());
