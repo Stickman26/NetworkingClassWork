@@ -1,6 +1,4 @@
 #pragma once
-#include "RakNet/NetworkIDObject.h"
-#include "RakNet/NetworkIDManager.h"
 
 /*
 objectives are to create a base Message class, 
@@ -21,20 +19,5 @@ Finally overload the >> and << bitstream operators
 to be able to write this data to and read from bitstreams
 */
 
-struct MinePosition
-{
-	float x, y, z;
-};
 
 //Make a message base class
-
-class Mine : public RakNet::NetworkIDObject
-{
-private:
-	MinePosition minePos;
-
-public:
-	Mine(float x, float y, float z, RakNet::NetworkIDManager* networkIDManager);
-
-	MinePosition GetPosition() { return minePos; }
-};
