@@ -118,11 +118,14 @@ int main(int const argc, char const* const argv[])
 					//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
 					printf("Please enter the room ID to join: ");
 					std::getline(std::cin, userID);
+					printf("\nPress p for player or s for spectator: ");
+					std::getline(std::cin, userMessage);
 
 					bsOut.Write((RakNet::MessageID)ID_JOIN_ROOM);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userID.c_str());
+					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					system("cls");
 					continue;
@@ -132,14 +135,11 @@ int main(int const argc, char const* const argv[])
 					//have user enter a room ID
 					printf("Please enter a room ID: ");
 					std::getline(std::cin, userID);
-					printf("\nPress p for player or s for spectator: ");
-					std::getline(std::cin, userMessage);
 
 					bsOut.Write((RakNet::MessageID)ID_CREATE_ROOM);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userID.c_str());
-					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					system("cls");
 					continue;
@@ -232,10 +232,23 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_JOIN_ROOM: 
 				{
-
+					RakNet::RakString rs;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(rs);
+					printf("%s\n", rs.C_String());
 				}
 				break;
 				case ID_CREATE_ROOM:
+				{
+					RakNet::RakString rs;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(rs);
+					printf("%s\n", rs.C_String());
+				}
+				break;
+				case ID_MESSAGE_SPECTATORS:
 				{
 					RakNet::RakString rs;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);

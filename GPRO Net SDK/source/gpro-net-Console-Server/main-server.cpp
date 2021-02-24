@@ -183,26 +183,81 @@ int main(int const argc, char const* const argv[])
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 						bsIn.Read(rt);
-
-						messages.open("logs.txt", std::fstream::app);
-						messages << ConvertTime(rt) << ": ";
-
 						bsIn.Read(id);
 						bsIn.Read(rs);
-						std::stringstream formatMessage;
-						formatMessage << "[" << id.C_String() << " to ALL]: " << rs.C_String();
-						std::string sendMessage = formatMessage.str();
 
-						printf(sendMessage.c_str());
+						std::map<std::string, RakNet::SystemAddress>::const_iterator userToFind;
+						std::vector<GameRoom>::const_iterator roomUserIsIn;
+						bool isPlayer = false;
 
-						messages << sendMessage.c_str();
-						messages << "\n";
-						messages.close();
+						//find the user in the userlist
+						for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
+						{
+							if(it->first == id.C_String())
+							{
+								userToFind = it;
+								break;
+							}
+						}
 
-						RakNet::BitStream bsOut;
-						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write(sendMessage.c_str());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						//find the room the specified user is in by checking every room
+						for (std::vector<GameRoom>::const_iterator roomBeingChecked = roomList.begin(); roomBeingChecked != roomList.end(); ++roomBeingChecked)
+						{
+							for (std::map<std::string, RakNet::SystemAddress>::const_iterator it2 = roomBeingChecked->Players.begin(); it2 != roomBeingChecked->Players.end(); ++it2)
+							{
+								if (it2->first == id.C_String())
+								{
+									roomUserIsIn = roomBeingChecked;
+									isPlayer = true;
+									break;
+								}
+							}
+
+							for (std::map<std::string, RakNet::SystemAddress>::const_iterator it2 = roomBeingChecked->Spectators.begin(); it2 != roomBeingChecked->Spectators.end(); ++it2)
+							{
+								if (it2->first == id.C_String())
+								{
+									roomUserIsIn = roomBeingChecked;
+									isPlayer = false;
+									break;
+								}
+							}
+						}
+
+						if(isPlayer)
+						{
+							//format user message
+							std::stringstream formatMessage;
+							formatMessage << "\n[" << id.C_String() << " to ALL]: " << rs.C_String();
+							std::string sendMessage = formatMessage.str();
+
+							printf(sendMessage.c_str());
+
+							RakNet::BitStream bsOut;
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write(sendMessage.c_str());
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						}
+						else
+						{
+							//format user message
+							std::stringstream formatMessage;
+							formatMessage << "\n[" << id.C_String() << " to Spectators]: " << rs.C_String();
+							std::string sendMessage = formatMessage.str();
+
+							printf(sendMessage.c_str());
+
+							std::map<std::string, RakNet::SystemAddress>::const_iterator it;
+							//send message to spectators
+							for (it = roomUserIsIn->Spectators.begin(); it != roomUserIsIn->Spectators.end(); ++it)
+							{
+								RakNet::BitStream bsOut;
+								bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+								bsOut.Write(sendMessage);
+								peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
+							}
+						}
+
 					}
 					break;
 				case ID_GAME_MESSAGE_2:
@@ -275,7 +330,7 @@ int main(int const argc, char const* const argv[])
 					if (it != roomList.end()) 
 					{
 						//if it does
-						formatMessage << "[you have attempted to create a room w/ ID " << rs.C_String() << " but that room already exists!]";
+						formatMessage << "You have attempted to create a room w/ ID " << rs.C_String() << " but that room already exists!";
 						sendMessage = formatMessage.str();
 						printf(sendMessage.c_str());
 
@@ -329,7 +384,7 @@ int main(int const argc, char const* const argv[])
 
 					if (it != roomList.end())
 					{
-						printf("%s has joined room w/ ID: %s", id.C_String(), rs.C_String());
+						printf("\n%s has joined room w/ ID: %s", id.C_String(), rs.C_String());
 
 						if(playerOrSpectator == "p")
 						{
@@ -352,7 +407,7 @@ int main(int const argc, char const* const argv[])
 							printf(sendMessage.c_str());
 
 							//actually join the room as a spectator
-							it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
+							it->Spectators.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
 
 							//this message should be sent to everyone to let players and spectators know that a spectator has joined
 							bsOut.Write((RakNet::MessageID)ID_MESSAGE_SPECTATORS);
@@ -383,7 +438,7 @@ int main(int const argc, char const* const argv[])
 					bsIn.Read(messageToSend);
 					bsIn.Read(roomToSend);
 
-					std::map<std::string, RakNet::SystemAddress> it;
+					std::map<std::string, RakNet::SystemAddress>::const_iterator it;
 					//send message to spectators
 					for(it = roomToSend.Spectators.begin(); it != roomToSend.Spectators.end(); ++it)
 					{
