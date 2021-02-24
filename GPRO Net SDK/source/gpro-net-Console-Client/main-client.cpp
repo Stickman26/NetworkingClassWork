@@ -116,7 +116,7 @@ int main(int const argc, char const* const argv[])
 					break;
 				case 'j':
 					//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
-					printf("Please enter the room ID or user ID to join: ");
+					printf("Please enter the room ID to join: ");
 					std::getline(std::cin, userID);
 
 					bsOut.Write((RakNet::MessageID)ID_JOIN_ROOM);

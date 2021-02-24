@@ -10,7 +10,7 @@ Message::Message()
 	typeID = ID_GAME_MESSAGE_1;
 }
 
-TextMessage::TextMessage(std::string name, std::string reciever = "ALL", std::string msg) : Message()
+TextMessage::TextMessage(std::string name, std::string msg, std::string reciever = "ALL") : Message()
 {
 	myMessage.UserName = name;
 	myMessage.Recipent = reciever;

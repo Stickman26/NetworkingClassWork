@@ -64,7 +64,7 @@ public:
 		std::string Message;
 	} myMessage;
 
-	TextMessage(std::string name, std::string reciever, std::string msg);
+	TextMessage(std::string name, std::string msg, std::string reciever);
 	~TextMessage();
 
 };

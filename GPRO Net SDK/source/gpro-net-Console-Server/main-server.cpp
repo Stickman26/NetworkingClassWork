@@ -268,8 +268,11 @@ int main(int const argc, char const* const argv[])
 					std::string sendMessage;
 					RakNet::BitStream bsOut;
 
+					std::string roomName = rs.C_String();
+					std::vector<GameRoom>::iterator it = find_if(roomList.begin(), roomList.end(), [roomName](const GameRoom& i) { return i.RoomName == roomName; });
+
 					//see if a room w/ specified ID exists
-					if (find(roomList.begin() , roomList.end(), rs.C_String()) != roomList.end()) 
+					if (it != roomList.end()) 
 					{
 						//if it does
 						formatMessage << "[you have attempted to create a room w/ ID " << rs.C_String() << " but that room already exists!]";
@@ -318,7 +321,8 @@ int main(int const argc, char const* const argv[])
 					RakNet::BitStream bsOut;
 
 					//check if specified room exists and if it does, join it
-					std::vector<GameRoom>::iterator it = find(roomList.begin(), roomList.end(), rs.C_String());
+					std::string roomName = rs.C_String();
+					std::vector<GameRoom>::iterator it = find_if(roomList.begin(), roomList.end(), [roomName](const GameRoom& i) { return i.RoomName == roomName; });
 
 					if (it != roomList.end())
 					{
@@ -334,7 +338,7 @@ int main(int const argc, char const* const argv[])
 
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write(sendMessage.c_str());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
 					}
 					else 
 					{
