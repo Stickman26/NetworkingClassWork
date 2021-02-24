@@ -306,6 +306,7 @@ int main(int const argc, char const* const argv[])
 				{
 					RakNet::RakString id;
 					RakNet::RakString rs;
+					RakNet::RakString playerOrSpectator;
 					RakNet::Time rt;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
@@ -315,6 +316,8 @@ int main(int const argc, char const* const argv[])
 					bsIn.Read(id);
 					//read in room ID that user is trying to join
 					bsIn.Read(rs);
+					//read in if the person should be a player or spectator
+					bsIn.Read(playerOrSpectator);
 
 					std::stringstream formatMessage;
 					std::string sendMessage;
@@ -326,29 +329,68 @@ int main(int const argc, char const* const argv[])
 
 					if (it != roomList.end())
 					{
-						printf("%s has joined room w/ ID: ", id.C_String());
-						printf("%s", rs.C_String());
-						//actually join the room
+						printf("%s has joined room w/ ID: %s", id.C_String(), rs.C_String());
 
-						it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
+						if(playerOrSpectator == "p")
+						{
+							formatMessage << "Player " << id.C_String() << " joined room " << rs.C_String() << "!\n";
+							sendMessage = formatMessage.str();
+							printf(sendMessage.c_str());
 
-						formatMessage << "[" << id.C_String() << " joined room " << rs.C_String() << "]\n";
-						sendMessage = formatMessage.str();
-						printf(sendMessage.c_str());
+							//actually join the room as a player
+							it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
 
-						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write(sendMessage.c_str());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
+							//this message should be sent to everyone to let players and spectators know that a player has joined
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write(sendMessage.c_str());
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
+						}
+						else if (playerOrSpectator == "s")
+						{
+							formatMessage << "Spectator " << id.C_String() << " joined room " << rs.C_String() << "!\n";
+							sendMessage = formatMessage.str();
+							printf(sendMessage.c_str());
+
+							//actually join the room as a spectator
+							it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
+
+							//this message should be sent to everyone to let players and spectators know that a spectator has joined
+							bsOut.Write((RakNet::MessageID)ID_MESSAGE_SPECTATORS);
+							bsOut.Write(sendMessage.c_str());
+							bsOut.Write(it);
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
+						}
+						
 					}
 					else 
 					{
-						printf("[%s attempted to join room %s]\n", id.C_String(), rs.C_String());
-						formatMessage << "[room " << rs.C_String() << " does not exist]\n";
+						printf("%s attempted to join room %s\n", id.C_String(), rs.C_String());
+						formatMessage << "Room " << rs.C_String() << " does not exist!\n";
 						sendMessage = formatMessage.str();
 
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write(sendMessage.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+					}
+				}
+				break;
+				case ID_MESSAGE_SPECTATORS:
+				{
+					RakNet::RakString messageToSend;
+					GameRoom roomToSend;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(messageToSend);
+					bsIn.Read(roomToSend);
+
+					std::map<std::string, RakNet::SystemAddress> it;
+					//send message to spectators
+					for(it = roomToSend.Spectators.begin(); it != roomToSend.Spectators.end(); ++it)
+					{
+						RakNet::BitStream bsOut;
+						bsOut.Write((RakNet::MessageID)ID_MESSAGE_SPECTATORS);
+						bsOut.Write(messageToSend);
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
 					}
 				}
 				break;

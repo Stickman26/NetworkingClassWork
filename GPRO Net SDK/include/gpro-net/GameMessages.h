@@ -35,7 +35,9 @@ enum GameMessages
 	ID_SEND_LIST,
 	ID_CREATE_MINE,
 	ID_CREATE_ROOM,
-	ID_JOIN_ROOM
+	ID_JOIN_ROOM,
+	ID_MESSAGE_SPECTATORS,
+	ID_MESSAGE_PLAYERS
 };
 
 class Message : public RakNet::NetworkIDObject

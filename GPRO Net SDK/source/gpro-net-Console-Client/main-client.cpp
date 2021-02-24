@@ -132,11 +132,14 @@ int main(int const argc, char const* const argv[])
 					//have user enter a room ID
 					printf("Please enter a room ID: ");
 					std::getline(std::cin, userID);
+					printf("\nPress p for player or s for spectator: ");
+					std::getline(std::cin, userMessage);
 
 					bsOut.Write((RakNet::MessageID)ID_CREATE_ROOM);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
 					bsOut.Write(thisUserID.c_str());
 					bsOut.Write(userID.c_str());
+					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					system("cls");
 					continue;
