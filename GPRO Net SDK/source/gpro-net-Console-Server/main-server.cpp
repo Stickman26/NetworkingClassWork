@@ -449,6 +449,16 @@ int main(int const argc, char const* const argv[])
 					}
 				}
 				break;
+				case ID_STRUCT_TEST:
+				{
+					TextMessage* testing;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(testing);
+
+					printf("Testing our struct: %s", testing->myMessage.Message.c_str());
+				}
+				break;
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;
