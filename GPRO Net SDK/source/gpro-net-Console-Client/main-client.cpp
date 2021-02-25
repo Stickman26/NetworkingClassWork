@@ -23,7 +23,6 @@
 */
 
 #include "gpro-net/gpro-net.h"
-#include "gpro-net/MineLab.h"
 #include "gpro-net/GameMessages.h"
 
 #include <stdio.h>

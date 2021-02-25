@@ -45,7 +45,7 @@ class Message : public RakNet::NetworkIDObject
 {
 public:
 	Message();
-	~Message();
+	//~Message();
 
 	RakNet::NetworkID networkID;
 	RakNet::SystemAddress systemAddress;
@@ -68,28 +68,11 @@ public:
 	} myMessage;
 
 	TextMessage(std::string name, std::string msg, std::string reciever);
-	~TextMessage();
+	//~TextMessage();
 
 };
 
-namespace RakNet
-{
-	RakNet::BitStream& operator << (RakNet::BitStream& out, TextMessage::StringMessage& in)
-	{
-		out.Write(in.UserName);
-		out.Write(in.Recipent);
-		out.Write(in.Message);
-		return out;
-	}
-
-	RakNet::BitStream& operator >> (RakNet::BitStream& in, TextMessage::StringMessage& out)
-	{
-		bool sucess = in.Read(out.UserName);
-		assert(sucess);
-		sucess = in.Read(out.Recipent);
-		assert(sucess);
-		sucess = in.Read(out.Message);
-		assert(sucess);
-		return in;
-	}
-}
+//namespace RakNet
+//{
+	
+//}
