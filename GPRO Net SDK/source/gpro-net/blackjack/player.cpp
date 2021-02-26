@@ -11,7 +11,6 @@ void Player::Stand() {
 
 void Player::Double() {}
 
-
 void Player::Split() {}
 
 int Player::CheckHand() {

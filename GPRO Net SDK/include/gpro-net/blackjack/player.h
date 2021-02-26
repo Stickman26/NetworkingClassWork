@@ -4,7 +4,7 @@
 
 class Player {
 private:
-	vector<int>hand;
+	std::vector<int>hand;
 public:
 	void Hit();
 	void Stand();

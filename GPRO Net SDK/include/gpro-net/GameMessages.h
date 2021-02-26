@@ -71,3 +71,14 @@ public:
 	//~TextMessage();
 
 };
+
+enum BlackJackMoves
+{
+	Hit,
+	Stay
+};
+
+class BlackJackMove : public Message
+{
+
+};
