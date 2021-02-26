@@ -45,6 +45,9 @@
     <ClInclude Include="..\..\..\include\gpro-net\GameMessages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\gpro-net\blackjack\BlackJack.h">
+      <Filter>Header Files\blackjack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net.c">
@@ -70,6 +73,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\gpro-net\GameMessages.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\gpro-net\blackjack\BlackJack.cpp">
+      <Filter>Source Files\blackjack</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
