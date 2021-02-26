@@ -67,12 +67,7 @@ public:
 		std::string Message;
 	} myMessage;
 
-	TextMessage(std::string name, std::string msg, std::string reciever);
+	TextMessage(std::string name, std::string msg, std::string reciever = "ALL");
 	//~TextMessage();
 
 };
-
-//namespace RakNet
-//{
-	
-//}

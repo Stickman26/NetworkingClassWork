@@ -71,7 +71,7 @@ int main(int const argc, char const* const argv[])
 			std::string userID;
 			std::string userMessage;
 			std::string userSelection;
-			TextMessage* test;
+			TextMessage* textMessageObj;
 
 			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \nPress t to test our struct \n");
 			std::getline(std::cin, userSelection);
@@ -103,8 +103,10 @@ int main(int const argc, char const* const argv[])
 
 					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
-					bsOut.Write(thisUserID.c_str());
-					bsOut.Write(userMessage.c_str());
+					textMessageObj = new TextMessage(thisUserID, userMessage);
+					bsOut << textMessageObj->myMessage;
+					//bsOut.Write(thisUserID.c_str());
+					//bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					system("cls");
 					continue;
@@ -151,10 +153,10 @@ int main(int const argc, char const* const argv[])
 					std::getline(std::cin, userID);
 					printf("Please enter a message: ");
 					std::getline(std::cin, userMessage);
-					test = new TextMessage(thisUserID, userMessage, userID);
+					textMessageObj = new TextMessage(thisUserID, userMessage, userID);
 
 					bsOut.Write((RakNet::MessageID)ID_STRUCT_TEST);
-					bsOut.Write(test);
+					bsOut << *textMessageObj;
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					system("cls");
 					continue;
