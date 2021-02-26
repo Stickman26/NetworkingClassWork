@@ -116,6 +116,30 @@ int main(int const argc, char const* const argv[])
 							}
 						}
 
+						//find the room the specified user is in by checking every room
+						for (std::vector<GameRoom>::iterator roomBeingChecked = roomList.begin(); roomBeingChecked != roomList.end(); ++roomBeingChecked)
+						{
+							for (std::map<std::string, RakNet::SystemAddress>::iterator it2 = roomBeingChecked->Players.begin(); it2 != roomBeingChecked->Players.end(); ++it2)
+							{
+								if (it2->first == rs)
+								{
+									printf("Player %s removed from room %s\n", rs.c_str(), roomBeingChecked->RoomName.c_str());
+									roomBeingChecked->Players.erase(it2);
+									break;
+								}
+							}
+
+							for (std::map<std::string, RakNet::SystemAddress>::iterator it2 = roomBeingChecked->Spectators.begin(); it2 != roomBeingChecked->Spectators.end(); ++it2)
+							{
+								if (it2->first == rs)
+								{
+									printf("Spectator %s removed from room %s\n", rs.c_str(), roomBeingChecked->RoomName.c_str());
+									roomBeingChecked->Spectators.erase(it2);
+									break;
+								}
+							}
+						}
+
 						printf("%s has disconnected.\n", rs.c_str());
 
 						RakNet::BitStream bsOut;
@@ -135,6 +159,30 @@ int main(int const argc, char const* const argv[])
 								rs = it->first;
 								userList.erase(it);
 								break;
+							}
+						}
+
+						//find the room the specified user is in by checking every room
+						for (std::vector<GameRoom>::iterator roomBeingChecked = roomList.begin(); roomBeingChecked != roomList.end(); ++roomBeingChecked)
+						{
+							for (std::map<std::string, RakNet::SystemAddress>::iterator it2 = roomBeingChecked->Players.begin(); it2 != roomBeingChecked->Players.end(); ++it2)
+							{
+								if (it2->first == rs)
+								{
+									printf("Player %s removed from room %s\n", rs.c_str(), roomBeingChecked->RoomName.c_str());
+									roomBeingChecked->Players.erase(it2);
+									break;
+								}
+							}
+
+							for (std::map<std::string, RakNet::SystemAddress>::iterator it2 = roomBeingChecked->Spectators.begin(); it2 != roomBeingChecked->Spectators.end(); ++it2)
+							{
+								if (it2->first == rs)
+								{
+									printf("Spectator %s removed from room %s\n", rs.c_str(), roomBeingChecked->RoomName.c_str());
+									roomBeingChecked->Spectators.erase(it2);
+									break;
+								}
 							}
 						}
 
@@ -247,16 +295,16 @@ int main(int const argc, char const* const argv[])
 								std::map<std::string, RakNet::SystemAddress>::const_iterator it;
 								RakNet::BitStream bsOut;
 								bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-								bsOut.Write(sendMessage);
+								bsOut.Write(sendMessage.c_str());
 								//Send to Players
 								for (it = roomUserIsIn->Players.begin(); it != roomUserIsIn->Players.end(); ++it)
 								{
-									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
+									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, false);
 								}
 								//Send to Spectators
 								for (it = roomUserIsIn->Spectators.begin(); it != roomUserIsIn->Spectators.end(); ++it)
 								{
-									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
+									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, false);
 								}
 							}
 							else
@@ -272,7 +320,7 @@ int main(int const argc, char const* const argv[])
 								//send message to spectators
 								RakNet::BitStream bsOut;
 								bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-								bsOut.Write(sendMessage);
+								bsOut.Write(sendMessage.c_str());
 								for (it = roomUserIsIn->Spectators.begin(); it != roomUserIsIn->Spectators.end(); ++it)
 								{
 									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
@@ -435,7 +483,7 @@ int main(int const argc, char const* const argv[])
 							//this message should be sent to everyone to let players and spectators know that a player has joined
 							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 							bsOut.Write(sendMessage.c_str());
-							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 						else if (playerOrSpectator == "s")
 						{
@@ -450,7 +498,7 @@ int main(int const argc, char const* const argv[])
 							bsOut.Write((RakNet::MessageID)ID_MESSAGE_SPECTATORS);
 							bsOut.Write(sendMessage.c_str());
 							bsOut.Write(it);
-							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, true);
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 						
 					}
