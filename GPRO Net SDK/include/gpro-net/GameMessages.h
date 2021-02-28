@@ -74,11 +74,18 @@ public:
 
 enum BlackJackMoves
 {
-	Hit,
-	Stay
+	Hit = 0,
+	Stand
 };
 
-class BlackJackMove : public Message
+class BlackJackMoveMessage : public Message
 {
+public:
+	struct MoveStruct
+	{
+		std::string userName;
+		BlackJackMoves move;
+	} myMove;
 
+	BlackJackMoveMessage(std::string name, BlackJackMoves move);
 };
