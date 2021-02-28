@@ -176,10 +176,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\gpro-net\blackjack\BlackJack.h" />
-    <ClInclude Include="..\..\..\include\gpro-net\blackjack\dealer.h" />
     <ClInclude Include="..\..\..\include\gpro-net\blackjack\deck.h" />
-    <ClInclude Include="..\..\..\include\gpro-net\blackjack\game.h" />
-    <ClInclude Include="..\..\..\include\gpro-net\blackjack\player.h" />
     <ClInclude Include="..\..\..\include\gpro-net\GameMessages.h" />
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net-console.h" />
     <ClInclude Include="..\..\..\include\gpro-net\gpro-net-gamestate.h" />
@@ -187,11 +184,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\gpro-net\blackjack\BlackJack.cpp" />
-    <ClCompile Include="..\..\..\source\gpro-net\blackjack\dealer.cpp" />
     <ClCompile Include="..\..\..\source\gpro-net\blackjack\deck.cpp" />
-    <ClCompile Include="..\..\..\source\gpro-net\blackjack\game.cpp" />
-    <ClCompile Include="..\..\..\source\gpro-net\blackjack\mainbj.cpp" />
-    <ClCompile Include="..\..\..\source\gpro-net\blackjack\player.cpp" />
     <ClCompile Include="..\..\..\source\gpro-net\GameMessages.cpp" />
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net-console_win.c" />
     <ClCompile Include="..\..\..\source\gpro-net\gpro-net.c" />
