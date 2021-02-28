@@ -211,9 +211,3 @@ int BlackJack::cardScore(std::vector<Card>& hand)
 
 	return handScore;
 }
-
-bool BlackJack::handCheck(std::vector<Card>& hand)
-{
-	bool var = (cardScore(hand) <= 21);
-	return var;
-}

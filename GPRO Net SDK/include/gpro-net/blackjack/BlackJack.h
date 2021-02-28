@@ -20,6 +20,8 @@ private:
 
 	//Helper Functions
 	int cardScore(std::vector<Card>& hand);
+	bool handCheck(std::vector<Card>& hand) { return (cardScore(hand) <= 21); };
+	bool checkBlackJack(std::vector<Card>& hand) { return (cardScore(hand) == 21); };
 
 	//Visual Functions
 	std::string displayDealerHand();
@@ -37,6 +39,9 @@ public:
 	void currentPlayerHit();
 	void currentPlayerStand();
 
-	//Back End
-	bool handCheck(std::vector<Card>& hand);
+	//Public Helpers
+	bool currentHandCheck() { return handCheck(players[playerTurnIndex].hand); };
+	bool currentHandBlackJackCheck() { return checkBlackJack(players[playerTurnIndex].hand); };
+
+	std::string getCurrentPlayerName() { return players[playerTurnIndex].playerName; }
 };
