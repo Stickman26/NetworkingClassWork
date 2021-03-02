@@ -550,7 +550,20 @@ int main(int const argc, char const* const argv[])
 
 					
 					//find player and do the thing
-					GameRoom* roomToMakeMoveIn = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
+					std::vector<GameRoom>::iterator it = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
+					
+					if (it != roomList.end())
+					{
+						switch (playerMove->myMove.move)
+						{
+						case BlackJackMoves::Hit:
+							it->RoomSession.currentPlayerHit();
+							break;
+						case BlackJackMoves::Stand:
+							it->RoomSession.currentPlayerStand();
+							break;
+						}
+					}
 				}
 				break;
 				default:
