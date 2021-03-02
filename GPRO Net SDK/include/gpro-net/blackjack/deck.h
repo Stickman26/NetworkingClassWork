@@ -1,3 +1,8 @@
+/*
+Code implemented by:
+Lansingh Freeman
+Jason Gold
+*/
 #pragma once
 
 #include<iostream>

@@ -1,3 +1,8 @@
+/*
+Code implemented by:
+Lansingh Freeman
+Jason Gold
+*/
 #include "gpro-net/blackjack/deck.h"
 
 std::string Card::toString()
@@ -79,18 +84,22 @@ void Deck::resetDeck()
 
 	for (int suit = 0 ; suit < 4 ; ++suit)
 	{
-		for (int i = 0; i < 14; ++i)
+		for (int i = 0; i < 13; ++i)
 		{
 			switch (i)
 			{
+			case 1:
+				deck.push_back(Card(Suit(suit), 'A'));
+				break;
 			case 10:
 				deck.push_back(Card(Suit(suit), 'J'));
+				break;
 			case 11:
 				deck.push_back(Card(Suit(suit), 'Q'));
+				break;
 			case 12:
 				deck.push_back(Card(Suit(suit), 'K'));
-			case 13:
-				deck.push_back(Card(Suit(suit), 'A'));
+				break;
 			default:
 				deck.push_back(Card(Suit(suit),char(i)));
 				break;

@@ -1,3 +1,8 @@
+/*
+Code implemented by:
+Lansingh Freeman
+Jason Gold
+*/
 #include "gpro-net/blackjack/BlackJack.h"
 
 BlackJack::BlackJack()
@@ -182,10 +187,12 @@ int BlackJack::cardScore(std::vector<Card>& hand)
 	int handScore = 0;
 	bool hasAce = false;
 
+	//Check hands and assigns score based on value
 	for (int x = 0; x < hand.size(); ++x)
 	{
 		switch (hand[x].cardValue)
 		{
+		case '0':
 		case 'J':
 		case 'Q':
 		case 'K':

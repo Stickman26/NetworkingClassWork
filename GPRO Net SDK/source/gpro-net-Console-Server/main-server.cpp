@@ -23,8 +23,8 @@
 */
 
 #include "gpro-net/gpro-net.h"
-#include "gpro-net/MineLab.h"
 #include "gpro-net/GameMessages.h"
+#include "gpro-net/blackjack/BlackJack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,6 +62,7 @@ std::string ConvertTime(RakNet::Time ts) {
 
 struct GameRoom
 {
+	BlackJack RoomSession;
 	std::string RoomName;
 	int MaxPlayers;
 	std::map<std::string, RakNet::SystemAddress> Players;

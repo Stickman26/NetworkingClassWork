@@ -24,6 +24,7 @@
 
 #include "gpro-net/gpro-net.h"
 #include "gpro-net/GameMessages.h"
+#include "gpro-net/blackjack/BlackJack.h"
 
 #include <stdio.h>
 #include <stdlib.h>
