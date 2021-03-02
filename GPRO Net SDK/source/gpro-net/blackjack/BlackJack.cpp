@@ -133,6 +133,11 @@ std::string BlackJack::displayGameState()
 		//Player Details
 		output += players[playerTurnIndex].playerName + "'s Hand: " + displayPlayerHand(playerTurnIndex) + "\n";
 		output += "Hand Score: " + (cardScore(players[playerTurnIndex].hand));
+
+		if(!currentHandCheck())
+		{
+			output += "\n You have Busted. Better Luck next time.";
+		}
 		output += "\n\n";
 	}
 

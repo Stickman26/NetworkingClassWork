@@ -548,20 +548,65 @@ int main(int const argc, char const* const argv[])
 					bsIn.Read(rs);
 					std::string roomString = rs.C_String();
 
-					
 					//find player and do the thing
 					std::vector<GameRoom>::iterator it = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
-					
+
+					//make sure the player's room exists
 					if (it != roomList.end())
 					{
-						switch (playerMove->myMove.move)
+						RakNet::BitStream bsOut;
+						if(playerMove->myMove.userName == it->RoomSession.getCurrentPlayerName())
 						{
-						case BlackJackMoves::Hit:
-							it->RoomSession.currentPlayerHit();
-							break;
-						case BlackJackMoves::Stand:
-							it->RoomSession.currentPlayerStand();
-							break;
+							//actually do the player's move
+							switch (playerMove->myMove.move)
+							{
+							case BlackJackMoves::Hit:
+								it->RoomSession.currentPlayerHit();
+
+								//check if the player busted
+								if(it->RoomSession.currentHandCheck())
+								{
+									//check if the player has 21
+									if(it->RoomSession.currentHandBlackJackCheck())
+									{
+										it->RoomSession.currentPlayerStand();
+										bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
+										bsOut.Write(false);
+										peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+									}
+								}
+								else
+								{
+									//ends the player's turn
+									it->RoomSession.currentPlayerStand();
+									bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
+									bsOut.Write(false);
+									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+								}
+
+								break;
+							case BlackJackMoves::Stand:
+								it->RoomSession.currentPlayerStand();
+
+								//ends the player's turn
+								bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
+								bsOut.Write(false);
+								peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+								break;
+							}
+
+							//send the current gamestate to all members of the lobby
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write(it->RoomSession.displayGameState().c_str());
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						}
+						else
+						{
+							//Yell at the player for being impatient
+							RakNet::RakString messageToSend = "Please wait until your turn!";
+							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+							bsOut.Write(messageToSend.C_String());
+							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 						}
 					}
 				}
