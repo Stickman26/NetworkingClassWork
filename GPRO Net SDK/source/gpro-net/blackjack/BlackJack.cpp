@@ -31,7 +31,7 @@ void BlackJack::resetBlackJackGame(std::vector<std::string> names)
 	players.shrink_to_fit();
 
 	//reset turn count and number of turns
-	numberOfPlayers = names.size();
+	numberOfPlayers = (int)names.size();
 	playerTurnIndex = 0;
 
 	//assign all players & deal first card to each player

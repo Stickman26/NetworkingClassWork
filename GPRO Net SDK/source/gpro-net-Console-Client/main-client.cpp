@@ -44,8 +44,11 @@ int main(int const argc, char const* const argv[])
 	char str[512];
 
 	bool isConnected = false;
+	bool isInRoom = false;
+	bool isTurn = false;
 
 	std::string thisUserID;
+	std::string thisUserRoomID;
 
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	RakNet::Packet* packet;
@@ -74,7 +77,14 @@ int main(int const argc, char const* const argv[])
 			std::string userSelection;
 			TextMessage* textMessageObj;
 
-			printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \nPress t to test our struct \n");
+			if(isInRoom)
+			{
+				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \n");
+			}
+			else
+			{
+				printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \n");
+			}
 			std::getline(std::cin, userSelection);
 
 			switch (userSelection[0]) 
@@ -148,18 +158,46 @@ int main(int const argc, char const* const argv[])
 					continue;
 					//break;
 
-				case 't':
-					//testing our struct
-					printf("Please enter a user ID: ");
-					std::getline(std::cin, userID);
-					printf("Please enter a message: ");
-					std::getline(std::cin, userMessage);
-					textMessageObj = new TextMessage(thisUserID, userMessage, userID);
-
-					bsOut.Write((RakNet::MessageID)ID_STRUCT_TEST);
-					bsOut << *textMessageObj;
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
+				case 'h':
+					//if player chooses to hit make sure they're in a room
+					if(isInRoom && isTurn)
+					{
+						//write to server hit
+						BlackJackMoveMessage playerMove(userID, BlackJackMoves::Hit);
+						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
+						bsOut.Write(playerMove);
+						bsOut.Write(thisUserRoomID.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					}
+					else if (isInRoom && !isTurn)
+					{
+						printf("You must wait until your turn to access this function!");
+					}
+					else
+					{
+						printf("You must be in a room to access this function!");
+					}
+					continue;
+					
+				case 's':
+					//if the player chooses to stand, make sure they're in a room
+					if (isInRoom && isTurn)
+					{
+						//write to server stand
+						BlackJackMoveMessage playerMove(userID, BlackJackMoves::Stand);
+						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
+						bsOut.Write(playerMove);
+						bsOut.Write(thisUserRoomID.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					}
+					else if (isInRoom && !isTurn) 
+					{
+						printf("You must wait until your turn to access this function!");
+					}
+					else
+					{
+						printf("You must be in a room to access this function!");
+					}
 					continue;
 
 				default:
@@ -272,6 +310,21 @@ int main(int const argc, char const* const argv[])
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 					bsIn.Read(rs);
 					printf("%s\n", rs.C_String());
+				}
+				break;
+				case ID_MESSAGE_JOINER:
+				{
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(isInRoom);
+					bsIn.Read(thisUserRoomID);
+				}
+				break;
+				case ID_PLAYER_TURN:
+				{
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(isTurn);
 				}
 				break;
 				default:
