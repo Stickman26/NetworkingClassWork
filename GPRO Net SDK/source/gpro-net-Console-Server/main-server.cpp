@@ -611,6 +611,35 @@ int main(int const argc, char const* const argv[])
 					}
 				}
 				break;
+				case ID_START_GAME:
+				{
+					RakNet::RakString rs;
+					RakNet::BitStream bsIn(packet->data, packet->length, false);
+					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+					bsIn.Read(rs);
+					std::string roomString = rs.C_String();
+
+					//find player and do the thing
+					std::vector<GameRoom>::iterator it = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
+
+					if(it != roomList.end())
+					{
+						RakNet::BitStream bsOut;
+						std::vector<std::string> names;
+
+						for(std::map<std::string, RakNet::SystemAddress>::iterator it2 = it->Players.begin(); it2 != it->Players.end(); ++it2)
+						{
+							names.push_back(it2->first);
+						}
+
+						it->RoomSession.resetBlackJackGame(names);
+
+						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+						bsOut.Write(it->RoomSession.displayGameState().c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+					}
+				}
+				break;
 				default:
 					printf("Message with identifier %i has arrived.\n", packet->data[0]);
 					break;

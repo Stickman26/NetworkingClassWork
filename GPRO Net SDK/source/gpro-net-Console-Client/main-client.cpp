@@ -79,7 +79,7 @@ int main(int const argc, char const* const argv[])
 
 			if(isInRoom)
 			{
-				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \n");
+				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\n Press b to begin the game");
 			}
 			else
 			{
@@ -128,35 +128,40 @@ int main(int const argc, char const* const argv[])
 					system("cls");
 					break;
 				case 'j':
-					//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
-					printf("Please enter the room ID to join: ");
-					std::getline(std::cin, userID);
-					printf("\nPress p for player or s for spectator: ");
-					std::getline(std::cin, userMessage);
+					if(!isInRoom)
+					{
+						//have user enter the ID of either the room (if we do that?) or of a player whose room they wish to join
+						printf("Please enter the room ID to join: ");
+						std::getline(std::cin, userID);
+						printf("\nPress p for player or s for spectator: ");
+						std::getline(std::cin, userMessage);
 
-					bsOut.Write((RakNet::MessageID)ID_JOIN_ROOM);
-					bsOut.Write((RakNet::Time)RakNet::GetTime());
-					bsOut.Write(thisUserID.c_str());
-					bsOut.Write(userID.c_str());
-					bsOut.Write(userMessage.c_str());
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
-					continue;
-					//break;
-
+						bsOut.Write((RakNet::MessageID)ID_JOIN_ROOM);
+						bsOut.Write((RakNet::Time)RakNet::GetTime());
+						bsOut.Write(thisUserID.c_str());
+						bsOut.Write(userID.c_str());
+						bsOut.Write(userMessage.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						system("cls");
+						continue;
+						//break;
+					}
 				case 'c':
-					//have user enter a room ID
-					printf("Please enter a room ID: ");
-					std::getline(std::cin, userID);
+					if(!isInRoom)
+					{
+						//have user enter a room ID
+						printf("Please enter a room ID: ");
+						std::getline(std::cin, userID);
 
-					bsOut.Write((RakNet::MessageID)ID_CREATE_ROOM);
-					bsOut.Write((RakNet::Time)RakNet::GetTime());
-					bsOut.Write(thisUserID.c_str());
-					bsOut.Write(userID.c_str());
-					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
-					continue;
-					//break;
+						bsOut.Write((RakNet::MessageID)ID_CREATE_ROOM);
+						bsOut.Write((RakNet::Time)RakNet::GetTime());
+						bsOut.Write(thisUserID.c_str());
+						bsOut.Write(userID.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						system("cls");
+						continue;
+						//break;
+					}
 
 				case 'h':
 					//if player chooses to hit make sure they're in a room
@@ -200,6 +205,20 @@ int main(int const argc, char const* const argv[])
 					}
 					continue;
 
+				case 'b':
+					if(isInRoom)
+					{
+						//start the game
+						bsOut.Write((RakNet::MessageID)ID_START_GAME);
+						bsOut.Write(thisUserRoomID.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+						continue;
+					}
+					else
+					{
+						printf("You must be in a room to start the game!");
+						continue;
+					}
 				default:
 					printf("Invalid Input");
 					continue;
