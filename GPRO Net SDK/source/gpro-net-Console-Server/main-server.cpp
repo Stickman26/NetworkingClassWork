@@ -638,10 +638,11 @@ int main(int const argc, char const* const argv[])
 
 						it->RoomSession.resetBlackJackGame(names);
 
+						bsOut.Reset();
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						std::string sendMe = it->RoomSession.displayGameState();
-						printf(sendMe.c_str());
-						bsOut.Write(sendMe.c_str());
+						RakNet::RakString sendMe = it->RoomSession.displayGameState().c_str();
+						printf(sendMe.C_String());
+						bsOut.Write("FUCK TEWST");
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, false);
 					}
 				}

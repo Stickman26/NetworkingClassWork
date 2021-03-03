@@ -298,11 +298,10 @@ int main(int const argc, char const* const argv[])
 				case ID_GAME_MESSAGE_1:
 					{
 						RakNet::RakString rs;
-						std::string stringy;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-						bsIn.Read(stringy);
-						printf("%s\n" , stringy.c_str());
+						bsIn.Read(rs);
+						printf("%s\n" , rs.C_String());
 					}
 					break;
 				case ID_JOIN_ROOM: 
