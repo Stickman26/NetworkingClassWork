@@ -79,7 +79,7 @@ int main(int const argc, char const* const argv[])
 
 			if(isInRoom)
 			{
-				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\n Press b to begin the game");
+				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress b to begin the game\n");
 			}
 			else
 			{
@@ -176,11 +176,11 @@ int main(int const argc, char const* const argv[])
 					}
 					else if (isInRoom && !isTurn)
 					{
-						printf("You must wait until your turn to access this function!");
+						printf("You must wait until your turn to access this function!\n");
 					}
 					else
 					{
-						printf("You must be in a room to access this function!");
+						printf("You must be in a room to access this function!\n");
 					}
 					continue;
 					
@@ -197,11 +197,11 @@ int main(int const argc, char const* const argv[])
 					}
 					else if (isInRoom && !isTurn) 
 					{
-						printf("You must wait until your turn to access this function!");
+						printf("You must wait until your turn to access this function!\n");
 					}
 					else
 					{
-						printf("You must be in a room to access this function!");
+						printf("You must be in a room to access this function!\n");
 					}
 					continue;
 
@@ -216,7 +216,7 @@ int main(int const argc, char const* const argv[])
 					}
 					else
 					{
-						printf("You must be in a room to start the game!");
+						printf("You must be in a room to start the game!\n");
 						continue;
 					}
 				default:
@@ -298,10 +298,11 @@ int main(int const argc, char const* const argv[])
 				case ID_GAME_MESSAGE_1:
 					{
 						RakNet::RakString rs;
+						std::string stringy;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-						bsIn.Read(rs);
-						printf("%s\n" , rs.C_String());
+						bsIn.Read(stringy);
+						printf("%s\n" , stringy.c_str());
 					}
 					break;
 				case ID_JOIN_ROOM: 
@@ -335,15 +336,40 @@ int main(int const argc, char const* const argv[])
 				{
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					bsIn.Read(isInRoom);
-					bsIn.Read(thisUserRoomID);
+					int temp;
+					bsIn.Read(temp);
+
+					if(temp == 1)
+					{
+						isInRoom = true;
+					}
+					else
+					{
+						isInRoom = false;
+					}
+
+					RakNet::RakString rakkk;
+					bsIn.Read(rakkk);
+
+					thisUserRoomID = rakkk.C_String();
 				}
 				break;
 				case ID_PLAYER_TURN:
 				{
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					bsIn.Read(isTurn);
+					int temp;
+					bsIn.Read(temp);
+
+					if (temp == 1)
+					{
+						isTurn = true;
+					}
+					else
+					{
+						isTurn = false;
+					}
+
 				}
 				break;
 				default:

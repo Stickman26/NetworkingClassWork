@@ -470,7 +470,7 @@ int main(int const argc, char const* const argv[])
 
 					if (it != roomList.end())
 					{
-						printf("\n%s has joined room w/ ID: %s", id.C_String(), rs.C_String());
+						printf("\n%s has joined room w/ ID: %s\n", id.C_String(), rs.C_String());
 
 						if(playerOrSpectator == "p")
 						{
@@ -482,6 +482,7 @@ int main(int const argc, char const* const argv[])
 							it->Players.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
 
 							//this message should be sent to everyone to let players and spectators know that a player has joined
+							bsOut.Reset();
 							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 							bsOut.Write(sendMessage.c_str());
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
@@ -496,14 +497,16 @@ int main(int const argc, char const* const argv[])
 							it->Spectators.insert(std::pair<std::string, RakNet::SystemAddress>(id, packet->systemAddress));
 
 							//this message should be sent to everyone to let players and spectators know that a spectator has joined
+							bsOut.Reset();
 							bsOut.Write((RakNet::MessageID)ID_MESSAGE_SPECTATORS);
 							bsOut.Write(sendMessage.c_str());
-							bsOut.Write(it->RoomName.c_str());
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
+
+						bsOut.Reset();
 						bsOut.Write((RakNet::MessageID)ID_MESSAGE_JOINER);
-						bsOut.Write(true);
-						bsOut.Write(it);
+						bsOut.Write(1);
+						bsOut.Write(it->RoomName.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 					}
 					else 
@@ -512,6 +515,7 @@ int main(int const argc, char const* const argv[])
 						formatMessage << "Room " << rs.C_String() << " does not exist!\n";
 						sendMessage = formatMessage.str();
 
+						bsOut.Reset();
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						bsOut.Write(sendMessage.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
@@ -571,7 +575,7 @@ int main(int const argc, char const* const argv[])
 									{
 										it->RoomSession.currentPlayerStand();
 										bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-										bsOut.Write(false);
+										bsOut.Write(0);
 										peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 									}
 								}
@@ -580,7 +584,7 @@ int main(int const argc, char const* const argv[])
 									//ends the player's turn
 									it->RoomSession.currentPlayerStand();
 									bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-									bsOut.Write(false);
+									bsOut.Write(0);
 									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 								}
 
@@ -590,12 +594,13 @@ int main(int const argc, char const* const argv[])
 
 								//ends the player's turn
 								bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-								bsOut.Write(false);
+								bsOut.Write(0);
 								peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 								break;
 							}
 
 							//send the current gamestate to all members of the lobby
+							bsOut.Reset();
 							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 							bsOut.Write(it->RoomSession.displayGameState().c_str());
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
@@ -618,8 +623,7 @@ int main(int const argc, char const* const argv[])
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 					bsIn.Read(rs);
 					std::string roomString = rs.C_String();
-
-					//find player and do the thing
+					
 					std::vector<GameRoom>::iterator it = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
 
 					if(it != roomList.end())
@@ -635,8 +639,10 @@ int main(int const argc, char const* const argv[])
 						it->RoomSession.resetBlackJackGame(names);
 
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-						bsOut.Write(it->RoomSession.displayGameState().c_str());
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+						std::string sendMe = it->RoomSession.displayGameState();
+						printf(sendMe.c_str());
+						bsOut.Write(sendMe.c_str());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, false);
 					}
 				}
 				break;
