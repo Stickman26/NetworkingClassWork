@@ -171,7 +171,8 @@ int main(int const argc, char const* const argv[])
 						//write to server hit
 						delete playerMove;
 						playerMove = nullptr;
-						playerMove = new BlackJackMoveMessage(userID, BlackJackMoves::Hit);
+						playerMove = new BlackJackMoveMessage(thisUserID, BlackJackMoves::Hit);
+						
 						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
 						bsOut << playerMove->myMove;
 						bsOut.Write(thisUserRoomID.c_str());
@@ -190,7 +191,8 @@ int main(int const argc, char const* const argv[])
 						//write to server stand
 						delete playerMove;
 						playerMove = nullptr;
-						playerMove = new BlackJackMoveMessage(userID, BlackJackMoves::Stand);
+						playerMove = new BlackJackMoveMessage(thisUserID, BlackJackMoves::Stand);
+
 						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
 						bsOut << playerMove->myMove;
 						bsOut.Write(thisUserRoomID.c_str());

@@ -45,7 +45,7 @@ std::string Card::toString()
 		cardStr += "Hearts";
 		break;
 	case Suit::Club:
-		cardStr += "Club";
+		cardStr += "Clubs";
 		break;
 	}
 

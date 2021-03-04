@@ -549,9 +549,9 @@ int main(int const argc, char const* const argv[])
 					RakNet::RakString rs;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					bsIn >> playerMove;
+					playerMove = new BlackJackMoveMessage("", BlackJackMoves::Hit);
+					bsIn >> playerMove->myMove;
 					bsIn.Read(rs);
-					printf(rs.C_String());
 					std::string roomString = rs.C_String();
 
 					//find player and do the thing
@@ -560,15 +560,18 @@ int main(int const argc, char const* const argv[])
 					//make sure the player's room exists
 					if (it != roomList.end())
 					{
-						printf("hit");
+						std::string outputMessage = "";
 						RakNet::BitStream bsOut;
-						if(playerMove->myMove.userName == it->RoomSession.getCurrentPlayerName())
+
+						if(!it->RoomSession.gameEnded() && playerMove->myMove.userName == it->RoomSession.getCurrentPlayerName())
 						{
 							//actually do the player's move
 							switch (playerMove->myMove.move)
 							{
 							case BlackJackMoves::Hit:
 								it->RoomSession.currentPlayerHit();
+								outputMessage += it->RoomSession.getCurrentPlayerName() + " Hit\n Current Standing: \n";
+								outputMessage += it->RoomSession.displayGameState().c_str();
 
 								//check if the player busted
 								if(it->RoomSession.currentHandCheck())
@@ -576,30 +579,38 @@ int main(int const argc, char const* const argv[])
 									//check if the player has 21
 									if(it->RoomSession.currentHandBlackJackCheck())
 									{
+										outputMessage += it->RoomSession.getCurrentPlayerName() + " has 21! Moving to next turn\n\n";
 										it->RoomSession.currentPlayerStand();
-										//send message to all about success
+										outputMessage += it->RoomSession.displayGameState();
 									}
 								}
 								else
 								{
+									outputMessage += it->RoomSession.getCurrentPlayerName() + " has busted! Moving to next turn\n\n";
 									//ends the player's turn
 									it->RoomSession.currentPlayerStand();
-									//send message to all about a failure
+									outputMessage += it->RoomSession.displayGameState();
 								}
 
 								break;
 							case BlackJackMoves::Stand:
-
+								outputMessage += it->RoomSession.getCurrentPlayerName() + " stands! Moving to next turn\n\n";
 								//ends the player's turn
 								it->RoomSession.currentPlayerStand();
-								//end turn message
+								outputMessage += it->RoomSession.displayGameState();
 								break;
 							}
 
+							printf(outputMessage.c_str());
+
+							if (it->RoomSession.gameEnded())
+							{
+								it->GameInProgess = false;
+							}
+
 							//send the current gamestate to all members of the lobby
-							bsOut.Reset();
 							bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
-							bsOut.Write(it->RoomSession.displayGameState().c_str());
+							bsOut.Write(outputMessage.c_str());
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 						else

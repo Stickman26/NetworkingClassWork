@@ -49,4 +49,5 @@ public:
 	bool currentHandBlackJackCheck() { return checkBlackJack(players[playerTurnIndex].hand); };
 
 	std::string getCurrentPlayerName() { return players[playerTurnIndex].playerName; }
+	bool gameEnded() { return playerTurnIndex == numberOfPlayers; }
 };

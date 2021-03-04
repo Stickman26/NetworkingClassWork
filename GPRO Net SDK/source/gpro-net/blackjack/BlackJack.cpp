@@ -67,14 +67,14 @@ std::string BlackJack::displayGameState()
 		//Dealer Details
 		dealerReveal = true;
 		output += "Dealer's Hand: " + displayDealerHand() + "\n";
-		output += "Hand Score: " + (cardScore(dealerHand));
+		output += "Hand Score: " + std::to_string(cardScore(dealerHand));
 		output += "\n\n";
 
 		while (cardScore(dealerHand) < 17)
 		{
 			dealerHand.push_back(gameDeck.drawCard());
 			output += "Dealer's Hand: " + displayDealerHand() + "\n";
-			output += "Hand Score: " + (cardScore(dealerHand));
+			output += "Hand Score: " + std::to_string(cardScore(dealerHand));
 			output += "\n\n";
 		}
 
@@ -86,7 +86,7 @@ std::string BlackJack::displayGameState()
 			for (int i = 0; i < players.size(); ++i)
 			{
 				output += players[i].playerName;
-				if (handCheck(players[i].hand))
+				if (!handCheck(players[i].hand))
 				{
 					output += " Busts!";
 				}
@@ -102,8 +102,8 @@ std::string BlackJack::displayGameState()
 				{
 					output += " Drew!";
 				}
-				output += "\n P:" + cardScore(players[i].hand);
-				output += " to D:" + cardScore(dealerHand);
+				output += "\n P:" + std::to_string(cardScore(players[i].hand));
+				output += " to D:" + std::to_string(cardScore(dealerHand));
 				output += "\n\n";
 			}
 		}
@@ -134,11 +134,6 @@ std::string BlackJack::displayGameState()
 		//Player Details
 		output += players[playerTurnIndex].playerName + "'s Hand: " + displayPlayerHand(playerTurnIndex) + "\n";
 		output += "Hand Score: " + std::to_string(cardScore(players[playerTurnIndex].hand));
-
-		if(!currentHandCheck())
-		{
-			output += "\n You have Busted. Better Luck next time.";
-		}
 		output += "\n\n";
 	}
 
@@ -170,7 +165,7 @@ std::string BlackJack::displayPlayerHand(int index)
 	std::string cardStr = "";
 	cardStr = players[index].hand[0].toString();
 
-	for (int i = 1; i < dealerHand.size(); ++i)
+	for (int i = 1; i < players[index].hand.size(); ++i)
 	{
 		cardStr += ", " + players[index].hand[i].toString();
 	}
