@@ -39,7 +39,8 @@ enum GameMessages
 	ID_MESSAGE_JOINER,
 	ID_MESSAGE_PLAYERS,
 	ID_PLAYER_MOVE,
-	ID_START_GAME
+	ID_START_GAME,
+	ID_ROOM_LIST
 };
 
 class Message : public RakNet::NetworkIDObject

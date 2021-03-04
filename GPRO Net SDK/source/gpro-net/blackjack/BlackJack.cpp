@@ -142,6 +142,7 @@ std::string BlackJack::displayGameState()
 
 std::string BlackJack::displayDealerHand()
 {
+	//prints the dealer's hand
 	if (dealerReveal)
 	{
 		std::string cardStr = "";
@@ -162,6 +163,7 @@ std::string BlackJack::displayDealerHand()
 
 std::string BlackJack::displayPlayerHand(int index)
 {
+	//prints the user's hand
 	std::string cardStr = "";
 	cardStr = players[index].hand[0].toString();
 
@@ -175,11 +177,13 @@ std::string BlackJack::displayPlayerHand(int index)
 
 void BlackJack::currentPlayerHit()
 {
+	//adds a card to the specified hand
 	players[playerTurnIndex].hand.push_back(gameDeck.drawCard());
 }
 
 void BlackJack::currentPlayerStand()
 {
+	//end the player's turn
 	++playerTurnIndex;
 }
 
@@ -208,6 +212,7 @@ int BlackJack::cardScore(std::vector<Card>& hand)
 		}
 	}
 
+	//check for an ace and assign it's value accordingly
 	if (hasAce)
 	{
 		if ((handScore + 11) > 21)

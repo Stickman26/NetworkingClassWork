@@ -22,6 +22,12 @@
 	Main source for console client application.
 */
 
+/*
+Code implemented by:
+Lansingh Freeman
+Jason Gold
+*/
+
 #include "gpro-net/gpro-net.h"
 #include "gpro-net/GameMessages.h"
 #include "gpro-net/blackjack/BlackJack.h"
@@ -79,11 +85,11 @@ int main(int const argc, char const* const argv[])
 
 			if(isInRoom)
 			{
-				printf("Press h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress b to begin the game\n");
+				printf("Press b to begin the game\nPress h to hit \nPress s to stand \nPress r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress g to list all available game rooms\n");
 			}
 			else
 			{
-				printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room \n");
+				printf("Press r to recieve messages \nPress d to dm someone \nPress a to send a message to everyone\nPress l to list all connected users\nPress j to join a room \nPress c to create a room\nPress g to list all available game rooms\n");
 			}
 			std::getline(std::cin, userSelection);
 
@@ -218,6 +224,13 @@ int main(int const argc, char const* const argv[])
 						printf("You must be in a room to start the game!\n");
 						continue;
 					}
+				case 'g':
+				{
+					//output list of available game rooms to join
+					bsOut.Write((RakNet::MessageID)ID_ROOM_LIST);
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
+					continue;
+				}
 				default:
 					printf("Invalid Input");
 					continue;

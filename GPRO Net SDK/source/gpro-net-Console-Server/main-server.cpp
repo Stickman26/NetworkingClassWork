@@ -22,6 +22,12 @@
 	Main source for console server application.
 */
 
+/*
+Code implemented by:
+Lansingh Freeman
+Jason Gold
+*/
+
 #include "gpro-net/gpro-net.h"
 #include "gpro-net/GameMessages.h"
 #include "gpro-net/blackjack/BlackJack.h"
@@ -101,11 +107,13 @@ int main(int const argc, char const* const argv[])
 			{
 				case ID_NEW_INCOMING_CONNECTION:
 					{
+					//user connecting
 						printf("A connection is incoming.\n");
 					}
 					break;
 				case ID_DISCONNECTION_NOTIFICATION:
 					{
+					//checks for when a user disconnects and removes them from any room they were in
 						std::string rs;
 
 						for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
@@ -152,6 +160,7 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_CONNECTION_LOST:
 					{
+					//checks for when a user loses connection and removes them from the room they were in
 						std::string rs;
 
 						for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
@@ -198,6 +207,7 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_SEND_IDENTIFICATION:
 					{
+					//lets everyone know a user has connected
 						RakNet::RakString rs;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
@@ -213,6 +223,7 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_SEND_LIST:
 				{
+					//sends a list of all connected users back to the sender
 					std::stringstream formatMessage;
 					for (std::map<std::string, RakNet::SystemAddress>::const_iterator it = userList.begin(); it != userList.end(); ++it)
 					{
@@ -283,8 +294,10 @@ int main(int const argc, char const* const argv[])
 							}
 						}
 
+						//make sure user is in a room
 						if (isInRoom)
 						{
+							//check if the user is a player or spectator
 							if (isPlayer)
 							{
 								//format user message
@@ -349,6 +362,7 @@ int main(int const argc, char const* const argv[])
 					break;
 				case ID_GAME_MESSAGE_2:
 					{
+					//old message system, still used for DMs rather than our new system (if it ain't broke don't fix it)
 						RakNet::RakString uid; //user id
 						RakNet::RakString sid; //send id
 						RakNet::RakString rs;
@@ -471,8 +485,8 @@ int main(int const argc, char const* const argv[])
 
 					if (it != roomList.end())
 					{
-						printf("\n%s has joined room w/ ID: %s\n", id.C_String(), rs.C_String());
-
+						//printf("\n%s has joined room w/ ID: %s\n", id.C_String(), rs.C_String());
+						//check is user is player or spectator and send the message accordingly
 						if(playerOrSpectator == "p")
 						{
 							formatMessage << "Player " << id.C_String() << " joined room " << rs.C_String() << "!\n";
@@ -504,6 +518,7 @@ int main(int const argc, char const* const argv[])
 							peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						}
 
+						//message the user that just joined to let them know the room information
 						bsOut.Reset();
 						bsOut.Write((RakNet::MessageID)ID_MESSAGE_JOINER);
 						bsOut.Write(1);
@@ -525,6 +540,7 @@ int main(int const argc, char const* const argv[])
 				break;
 				case ID_MESSAGE_SPECTATORS:
 				{
+					//send a message to the spectators
 					RakNet::RakString messageToSend;
 					GameRoom roomToSend;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
@@ -545,6 +561,7 @@ int main(int const argc, char const* const argv[])
 				break;
 				case ID_PLAYER_MOVE:
 				{
+					//read in the player's move via custom struct
 					BlackJackMoveMessage* playerMove;
 					RakNet::RakString rs;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
@@ -626,6 +643,7 @@ int main(int const argc, char const* const argv[])
 				break;
 				case ID_START_GAME:
 				{
+					//starts the game and sends the current player's hand and the dealer's hand to all players
 					RakNet::RakString rs;
 					RakNet::BitStream bsIn(packet->data, packet->length, false);
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
@@ -658,6 +676,22 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write(sendMe.C_String());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
+				}
+				break;
+				case ID_ROOM_LIST:
+				{
+					//returns a list of all the available game rooms a player can join
+					std::stringstream formatMessage;
+					formatMessage << "---Open Rooms---\n";
+					for (std::vector<GameRoom>::iterator it = roomList.begin(); it != roomList.end(); ++it)
+					{
+						formatMessage << "Room ID: " << it->RoomName << "\n";
+					}
+					std::string sendMessage = formatMessage.str();
+					RakNet::BitStream bsOut;
+					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
+					bsOut.Write(sendMessage.c_str());
+					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
 				}
 				break;
 				default:
