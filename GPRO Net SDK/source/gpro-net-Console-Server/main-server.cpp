@@ -623,7 +623,6 @@ int main(int const argc, char const* const argv[])
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 					bsIn.Read(rs);
 					std::string roomString = rs.C_String();
-					
 					std::vector<GameRoom>::iterator it = std::find_if(roomList.begin(), roomList.end(), [roomString](const GameRoom& myRoom) {return myRoom.RoomName == roomString; });
 
 					if(it != roomList.end())
@@ -638,12 +637,12 @@ int main(int const argc, char const* const argv[])
 
 						it->RoomSession.resetBlackJackGame(names);
 
-						bsOut.Reset();
+						//bsOut.Reset();
 						bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 						RakNet::RakString sendMe = it->RoomSession.displayGameState().c_str();
 						printf(sendMe.C_String());
-						bsOut.Write("FUCK TEWST");
-						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, false);
+						bsOut.Write(sendMe.C_String());
+						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 					}
 				}
 				break;

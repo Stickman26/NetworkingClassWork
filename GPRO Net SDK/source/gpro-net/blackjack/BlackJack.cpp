@@ -4,6 +4,7 @@ Lansingh Freeman
 Jason Gold
 */
 #include "gpro-net/blackjack/BlackJack.h"
+#include <string>
 
 BlackJack::BlackJack()
 {
@@ -132,7 +133,7 @@ std::string BlackJack::displayGameState()
 
 		//Player Details
 		output += players[playerTurnIndex].playerName + "'s Hand: " + displayPlayerHand(playerTurnIndex) + "\n";
-		output += "Hand Score: " + (cardScore(players[playerTurnIndex].hand));
+		output += "Hand Score: " + std::to_string(cardScore(players[playerTurnIndex].hand));
 
 		if(!currentHandCheck())
 		{
@@ -207,7 +208,7 @@ int BlackJack::cardScore(std::vector<Card>& hand)
 			hasAce = true;
 			break;
 		default:
-			handScore += (hand[x].cardValue - '0');
+			handScore += int(hand[x].cardValue - '0');
 			break;
 		}
 	}

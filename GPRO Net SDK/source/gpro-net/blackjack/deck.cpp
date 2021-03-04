@@ -27,7 +27,7 @@ std::string Card::toString()
 		cardStr += "Ace";
 		break;
 	default:
-		cardStr += cardValue;
+		cardStr.push_back(cardValue);
 		break;
 	}
 
@@ -101,7 +101,7 @@ void Deck::resetDeck()
 				deck.push_back(Card(Suit(suit), 'K'));
 				break;
 			default:
-				deck.push_back(Card(Suit(suit),char(i)));
+				deck.push_back(Card(Suit(suit),char(i + '0')));
 				break;
 			}
 		}

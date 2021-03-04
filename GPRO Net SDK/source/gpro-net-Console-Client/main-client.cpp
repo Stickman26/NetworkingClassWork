@@ -90,7 +90,7 @@ int main(int const argc, char const* const argv[])
 			switch (userSelection[0]) 
 			{
 				case 'r':
-					system("cls");
+					//system("cls");
 					break;
 				case 'd':
 					printf("Who do you wish to connect to: ");
@@ -105,7 +105,7 @@ int main(int const argc, char const* const argv[])
 					bsOut.Write(userID.c_str());
 					bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
+					//system("cls");
 					continue;
 					//break;
 				case 'a':
@@ -119,13 +119,13 @@ int main(int const argc, char const* const argv[])
 					//bsOut.Write(thisUserID.c_str());
 					//bsOut.Write(userMessage.c_str());
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
+					//system("cls");
 					continue;
 					//break;
 				case 'l':
 					bsOut.Write((RakNet::MessageID)ID_SEND_LIST);
 					peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					system("cls");
+					//system("cls");
 					break;
 				case 'j':
 					if(!isInRoom)
@@ -142,7 +142,7 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write(userID.c_str());
 						bsOut.Write(userMessage.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-						system("cls");
+						//system("cls");
 						continue;
 						//break;
 					}
@@ -158,7 +158,7 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write(thisUserID.c_str());
 						bsOut.Write(userID.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-						system("cls");
+						//system("cls");
 						continue;
 						//break;
 					}
