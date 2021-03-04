@@ -338,7 +338,7 @@ int main(int const argc, char const* const argv[])
 								bsOut.Write(sendMessage.c_str());
 								for (it = roomUserIsIn->Spectators.begin(); it != roomUserIsIn->Spectators.end(); ++it)
 								{
-									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, true);
+									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, it->second, false);
 								}
 							}
 						}
