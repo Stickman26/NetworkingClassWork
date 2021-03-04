@@ -17,7 +17,7 @@ TextMessage::TextMessage(std::string name, std::string msg, std::string reciever
 	myMessage.Message = msg;
 }
 
-BlackJackMoveMessage::BlackJackMoveMessage(std::string name, BlackJackMoves move)
+BlackJackMoveMessage::BlackJackMoveMessage(std::string name, BlackJackMoves move) : Message()
 {
 	myMove.userName = name;
 	myMove.move = move;

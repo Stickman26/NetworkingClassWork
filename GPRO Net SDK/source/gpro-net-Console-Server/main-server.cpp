@@ -64,6 +64,7 @@ struct GameRoom
 {
 	BlackJack RoomSession;
 	std::string RoomName;
+	bool GameInProgess = false;
 	int MaxPlayers;
 	std::map<std::string, RakNet::SystemAddress> Players;
 	std::map<std::string, RakNet::SystemAddress> Spectators;
@@ -230,7 +231,7 @@ int main(int const argc, char const* const argv[])
 						//RakNet::RakString rs;
 						std::string id;
 						std::string rs;
-						TextMessage* txtObj = new TextMessage(std::string("a"), std::string("a"), std::string("a"));
+						TextMessage* txtObj = new TextMessage(std::string("a"), std::string("a"));
 						RakNet::Time rt;
 						RakNet::BitStream bsIn(packet->data, packet->length, false);
 						bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
@@ -550,6 +551,7 @@ int main(int const argc, char const* const argv[])
 					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
 					bsIn >> playerMove;
 					bsIn.Read(rs);
+					printf(rs.C_String());
 					std::string roomString = rs.C_String();
 
 					//find player and do the thing
@@ -558,6 +560,7 @@ int main(int const argc, char const* const argv[])
 					//make sure the player's room exists
 					if (it != roomList.end())
 					{
+						printf("hit");
 						RakNet::BitStream bsOut;
 						if(playerMove->myMove.userName == it->RoomSession.getCurrentPlayerName())
 						{
@@ -574,28 +577,22 @@ int main(int const argc, char const* const argv[])
 									if(it->RoomSession.currentHandBlackJackCheck())
 									{
 										it->RoomSession.currentPlayerStand();
-										bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-										bsOut.Write(0);
-										peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+										//send message to all about success
 									}
 								}
 								else
 								{
 									//ends the player's turn
 									it->RoomSession.currentPlayerStand();
-									bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-									bsOut.Write(0);
-									peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+									//send message to all about a failure
 								}
 
 								break;
 							case BlackJackMoves::Stand:
-								it->RoomSession.currentPlayerStand();
 
 								//ends the player's turn
-								bsOut.Write((RakNet::MessageID)ID_PLAYER_TURN);
-								bsOut.Write(0);
-								peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 1, packet->systemAddress, false);
+								it->RoomSession.currentPlayerStand();
+								//end turn message
 								break;
 							}
 
@@ -627,6 +624,12 @@ int main(int const argc, char const* const argv[])
 
 					if(it != roomList.end())
 					{
+						if (it->GameInProgess)
+						{
+							break;
+						}
+						it->GameInProgess = true;
+
 						RakNet::BitStream bsOut;
 						std::vector<std::string> names;
 

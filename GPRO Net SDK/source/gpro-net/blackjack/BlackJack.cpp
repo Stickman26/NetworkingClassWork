@@ -213,13 +213,16 @@ int BlackJack::cardScore(std::vector<Card>& hand)
 		}
 	}
 
-	if ((handScore + 11) > 21)
+	if (hasAce)
 	{
-		handScore += 1;
-	}
-	else
-	{
-		handScore += 11;
+		if ((handScore + 11) > 21)
+		{
+			handScore += 1;
+		}
+		else
+		{
+			handScore += 11;
+		}
 	}
 
 	return handScore;

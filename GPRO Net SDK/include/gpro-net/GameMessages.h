@@ -39,7 +39,6 @@ enum GameMessages
 	ID_MESSAGE_JOINER,
 	ID_MESSAGE_PLAYERS,
 	ID_PLAYER_MOVE,
-	ID_PLAYER_TURN,
 	ID_START_GAME
 };
 
@@ -74,7 +73,7 @@ public:
 
 };
 
-enum BlackJackMoves
+enum class BlackJackMoves: int
 {
 	Hit = 0,
 	Stand

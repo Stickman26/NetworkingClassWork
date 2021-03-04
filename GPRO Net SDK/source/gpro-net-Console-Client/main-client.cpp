@@ -45,7 +45,6 @@ int main(int const argc, char const* const argv[])
 
 	bool isConnected = false;
 	bool isInRoom = false;
-	bool isTurn = false;
 
 	std::string thisUserID;
 	std::string thisUserRoomID;
@@ -75,7 +74,8 @@ int main(int const argc, char const* const argv[])
 			std::string userID;
 			std::string userMessage;
 			std::string userSelection;
-			TextMessage* textMessageObj;
+			TextMessage* textMessageObj = nullptr;
+			BlackJackMoveMessage* playerMove = nullptr;
 
 			if(isInRoom)
 			{
@@ -114,6 +114,8 @@ int main(int const argc, char const* const argv[])
 
 					bsOut.Write((RakNet::MessageID)ID_GAME_MESSAGE_1);
 					bsOut.Write((RakNet::Time)RakNet::GetTime());
+					delete textMessageObj;
+					textMessageObj = nullptr;
 					textMessageObj = new TextMessage(thisUserID, userMessage);
 					bsOut << textMessageObj->myMessage;
 					//bsOut.Write(thisUserID.c_str());
@@ -143,9 +145,9 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write(userMessage.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						//system("cls");
-						continue;
 						//break;
 					}
+					continue;
 				case 'c':
 					if(!isInRoom)
 					{
@@ -159,24 +161,21 @@ int main(int const argc, char const* const argv[])
 						bsOut.Write(userID.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
 						//system("cls");
-						continue;
 						//break;
 					}
-
+					continue;
 				case 'h':
 					//if player chooses to hit make sure they're in a room
-					if(isInRoom && isTurn)
+					if(isInRoom)
 					{
 						//write to server hit
-						BlackJackMoveMessage playerMove(userID, BlackJackMoves::Hit);
+						delete playerMove;
+						playerMove = nullptr;
+						playerMove = new BlackJackMoveMessage(userID, BlackJackMoves::Hit);
 						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
-						bsOut.Write(playerMove);
+						bsOut << playerMove->myMove;
 						bsOut.Write(thisUserRoomID.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					}
-					else if (isInRoom && !isTurn)
-					{
-						printf("You must wait until your turn to access this function!\n");
 					}
 					else
 					{
@@ -186,18 +185,16 @@ int main(int const argc, char const* const argv[])
 					
 				case 's':
 					//if the player chooses to stand, make sure they're in a room
-					if (isInRoom && isTurn)
+					if (isInRoom)
 					{
 						//write to server stand
-						BlackJackMoveMessage playerMove(userID, BlackJackMoves::Stand);
+						delete playerMove;
+						playerMove = nullptr;
+						playerMove = new BlackJackMoveMessage(userID, BlackJackMoves::Stand);
 						bsOut.Write((RakNet::MessageID)ID_PLAYER_MOVE);
-						bsOut.Write(playerMove);
+						bsOut << playerMove->myMove;
 						bsOut.Write(thisUserRoomID.c_str());
 						peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0, RakNet::UNASSIGNED_SYSTEM_ADDRESS, true);
-					}
-					else if (isInRoom && !isTurn) 
-					{
-						printf("You must wait until your turn to access this function!\n");
 					}
 					else
 					{
@@ -351,24 +348,6 @@ int main(int const argc, char const* const argv[])
 					bsIn.Read(rakkk);
 
 					thisUserRoomID = rakkk.C_String();
-				}
-				break;
-				case ID_PLAYER_TURN:
-				{
-					RakNet::BitStream bsIn(packet->data, packet->length, false);
-					bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
-					int temp;
-					bsIn.Read(temp);
-
-					if (temp == 1)
-					{
-						isTurn = true;
-					}
-					else
-					{
-						isTurn = false;
-					}
-
 				}
 				break;
 				default:
