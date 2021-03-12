@@ -27,6 +27,10 @@
 
 int main(int const argc, char const* const argv[])
 {
+	//Reference list of all active servers
+		//if subservers are handled in master, they will need structs to manage content, otherwise they simply need a serveraddress with the optional addition of a tag.
+	//Reference list of active users in master
+
 	gproNet::cRakNetServer server;
 
 	while (1)

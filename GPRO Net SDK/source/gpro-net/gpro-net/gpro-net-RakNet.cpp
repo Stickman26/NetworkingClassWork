@@ -42,6 +42,17 @@ namespace gproNet
 		// process messages that can be handled the same way for all types of peers
 		//switch (msgID)
 		//{
+		/*
+		//<standard RakNet messages here>
+		//new message types
+		case ConnectionServerMesssage:
+			//connect user to subserver via list of current active servers
+			return true;
+		case DisconnectFromServerMessage:
+			//disconnect user from subserver and return them to main server
+			return true;
+
+		*/
 		//}
 		return false;
 	}
