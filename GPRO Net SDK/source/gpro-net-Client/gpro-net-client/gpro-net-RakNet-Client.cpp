@@ -96,7 +96,24 @@ namespace gproNet
 			// client receives greeting, just print it
 			ReadTest(bitstream);
 		}	return true;
+		case ID_GPRO_MESSAGE_UPDATE_POSITION:
+		{
+			sSimulationAgent agent;
+			sSimulationAgent::Read(bitstream, agent);
 
+			// we perform dead reckoning here
+			// algorithm: 
+			// calculate threshold
+			// -within threshold
+			//		-> kinematic equations to calculate our latest position
+			//		-> same for velocity
+			//		-> lerp between ours and theirs
+			// -else
+			//		-> snap to theirs
+
+			// update our (client) agent
+			agents[agent.ownerID][agent.agentID] = agent;
+		}
 		}
 		return false;
 	}

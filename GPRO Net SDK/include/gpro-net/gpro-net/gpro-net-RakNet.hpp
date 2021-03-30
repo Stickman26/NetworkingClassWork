@@ -45,6 +45,8 @@ namespace gproNet
 	enum eSettings
 	{
 		SET_GPRO_SERVER_PORT = 7777,
+		SET_GPRO_MAX_CLIENTS = 8,
+		SET_GPRO_MAX_AGENTS_PER_CLIENT = 16,
 	};
 
 
@@ -54,9 +56,28 @@ namespace gproNet
 	{
 		ID_GPRO_MESSAGE_COMMON_BEGIN = ID_USER_PACKET_ENUM,
 
-
+		ID_GPRO_MESSAGE_UPDATE_POSITION,
 
 		ID_GPRO_MESSAGE_COMMON_END
+	};
+
+	struct sSimulationAgent
+	{
+		short ownerID, agentID;
+		float position[3];
+		float velocity[3];
+		float acceleration[3];
+
+		//writing to a bitstream
+		static RakNet::BitStream& Write(RakNet::BitStream& bitstream, sSimulationAgent const& boid)
+		{
+			return bitstream;
+		}
+		//reading to a bitstream
+		static RakNet::BitStream& Read(RakNet::BitStream& bitstream, sSimulationAgent& boid)
+		{
+			return bitstream;
+		}
 	};
 
 
@@ -69,6 +90,8 @@ namespace gproNet
 		// peer
 		//	Pointer to RakNet peer instance.
 		RakNet::RakPeerInterface* peer;
+
+		sSimulationAgent agents[SET_GPRO_MAX_CLIENTS][SET_GPRO_MAX_AGENTS_PER_CLIENT];
 
 		// protected methods
 	protected:
